@@ -37,30 +37,36 @@ class MainActivity : Activity() {
         }
 
         val title = TextView(this).apply {
-            text = "فوروارد پیامک"
+            text = "فوروارد پیامک‌های MALIAT"
             textSize = 22f
             gravity = Gravity.CENTER
             setPadding(0, 0, 0, dp(16))
         }
 
+        val help = TextView(this).apply {
+            text = "فقط پیامک‌هایی که فرستنده‌شان با مقدار زیر مطابقت داشته باشد، به شماره مقصد ارسال می‌شوند. پیامک‌های سایر فرستنده‌ها نادیده گرفته می‌شوند."
+            textSize = 14f
+            setPadding(0, 0, 0, dp(12))
+        }
+
         etSource = EditText(this).apply {
-            hint = "شماره یا نام فرستنده (مبدأ)"
+            hint = "نام یا شماره فرستنده (پیش‌فرض: MALIAT)"
             inputType = InputType.TYPE_CLASS_TEXT
-            setText(prefs.getString("source", ""))
+            setText(prefs.getString("source", "MALIAT"))
         }
         etTarget = EditText(this).apply {
-            hint = "شماره مقصد (مثلاً 09123456789)"
+            hint = "شماره مقصد با کد کشور"
             inputType = InputType.TYPE_CLASS_PHONE
             setText(prefs.getString("target", ""))
         }
         swEnabled = Switch(this).apply {
-            text = "فعال"
+            text = "فعال‌سازی فوروارد فقط برای فرستنده انتخاب‌شده"
             isChecked = prefs.getBoolean("enabled", true)
             setPadding(0, dp(12), 0, dp(12))
         }
 
         val btnSave = Button(this).apply {
-            text = "ذخیره"
+            text = "ذخیره تنظیمات"
             setOnClickListener { save() }
         }
         val btnPerm = Button(this).apply {
@@ -72,7 +78,7 @@ class MainActivity : Activity() {
             setOnClickListener { requestIgnoreBattery() }
         }
 
-        listOf(title, etSource, etTarget, swEnabled, btnSave, btnPerm, btnBattery)
+        listOf(title, help, etSource, etTarget, swEnabled, btnSave, btnPerm, btnBattery)
             .forEach { root.addView(it) }
 
         setContentView(ScrollView(this).apply { addView(root) })
@@ -80,12 +86,18 @@ class MainActivity : Activity() {
     }
 
     private fun save() {
+        val source = etSource.text.toString().trim()
+        val target = etTarget.text.toString().trim()
+        if (swEnabled.isChecked && (source.isEmpty() || target.isEmpty())) {
+            Toast.makeText(this, "نام فرستنده و شماره مقصد را وارد کنید", Toast.LENGTH_LONG).show()
+            return
+        }
         getSharedPreferences("cfg", Context.MODE_PRIVATE).edit()
-            .putString("source", etSource.text.toString().trim())
-            .putString("target", etTarget.text.toString().trim())
+            .putString("source", source)
+            .putString("target", target)
             .putBoolean("enabled", swEnabled.isChecked)
             .apply()
-        Toast.makeText(this, "ذخیره شد", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "تنظیمات ذخیره شد", Toast.LENGTH_SHORT).show()
     }
 
     private fun requestSmsPermissions() {
