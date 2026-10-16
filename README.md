@@ -64,8 +64,8 @@
 
 ## Download | دریافت برنامه
 
-- **Test APK / نسخهٔ آزمایشی:** open the latest successful [Build APK workflow](https://github.com/sdwqe34/SMS_Forwarder/actions/workflows/android.yml) and download the `sms-forwarder-debug` artifact.
-- **GitHub Packages / بستهٔ منتشرشده:** [Open the account's Packages page](https://github.com/users/sdwqe34/packages?repo_name=SMS_Forwarder). Package publishing runs when a commit explicitly marked for publishing completes successfully.
+- **Direct APK download / دانلود مستقیم APK:** download [SMS-Forwarder-1.2.0.apk](https://github.com/sdwqe34/SMS_Forwarder/releases/download/v1.2.0/SMS-Forwarder-1.2.0.apk) from the [GitHub Release](https://github.com/sdwqe34/SMS_Forwarder/releases/tag/v1.2.0). If the release is not visible yet, open the [Build and publish workflow](https://github.com/sdwqe34/SMS_Forwarder/actions/workflows/android.yml) and download the `sms-forwarder-debug` artifact from a successful run.
+- **GitHub Packages / بستهٔ منتشرشده:** [Open the account's Packages page](https://github.com/users/sdwqe34/packages?repo_name=SMS_Forwarder).
 
 ## Build from source | ساخت از سورس
 

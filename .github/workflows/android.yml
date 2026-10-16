@@ -6,7 +6,7 @@ on:
     branches: [ main, master ]
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -46,3 +46,56 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gradle --no-daemon publishSmsForwarderApkPublicationToGitHubPackagesRepository
+
+  release:
+    needs: build
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-release]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download tested build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sms-forwarder-debug
+          path: release-assets
+
+      - name: Prepare release asset and checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s release-assets/app-debug.apk
+          cp release-assets/app-debug.apk release-assets/SMS-Forwarder-1.2.0.apk
+          cd release-assets
+          sha256sum SMS-Forwarder-1.2.0.apk > SMS-Forwarder-1.2.0.apk.sha256
+
+      - name: Publish GitHub Release with direct APK download
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.2.0
+          target_commitish: ${{ github.sha }}
+          name: SMS Forwarder v1.2.0
+          body: |
+            ## English
+            First installable test release of SMS Forwarder.
+            - Choose a sender from the SMS inbox or Contacts.
+            - Choose a destination from Contacts, recent SMS senders, or enter a number.
+            - Optionally auto-forward future incoming messages from the selected sender only.
+            - Send one selected existing SMS manually with confirmation.
+
+            This is a debug-signed APK for testing. Real-device, carrier delivery, and device-specific background behavior still need testing. Review SMS and Contacts permissions before use.
+
+            ## فارسی
+            اولین نسخهٔ آزمایشی قابل نصب برنامهٔ SMS Forwarder.
+            - انتخاب فرستنده از صندوق پیامک یا مخاطبین.
+            - انتخاب گیرنده از مخاطبین، پیامک‌های اخیر یا ورود دستی شماره.
+            - فوروارد خودکار پیامک‌های جدید فقط از فرستندهٔ انتخاب‌شده.
+            - ارسال دستی یک پیام قدیمی پس از تأیید.
+
+            این فایل با امضای Debug ساخته شده است. عملکرد روی گوشی و تحویل پیام توسط اپراتور باید آزمایش شود. پیش از استفاده، مجوزهای پیامک و مخاطبین را بررسی کنید.
+          files: |
+            release-assets/SMS-Forwarder-1.2.0.apk
+            release-assets/SMS-Forwarder-1.2.0.apk.sha256
+          draft: false
+          prerelease: false
+          make_latest: true
