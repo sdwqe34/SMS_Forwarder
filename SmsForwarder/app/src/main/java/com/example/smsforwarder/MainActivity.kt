@@ -69,7 +69,7 @@ class MainActivity : Activity() {
             hint = "شماره یا شناسه فرستنده؛ مثلاً MALIAT"
             inputType = InputType.TYPE_CLASS_TEXT
             setText(prefs.getString("source", ""))
-            singleLine = true
+            isSingleLine = true
         }
         root.addView(etSource, matchWidth())
         addButtonRow(
@@ -83,7 +83,7 @@ class MainActivity : Activity() {
             hint = "شماره مقصد با کد کشور، یا انتخاب از فهرست"
             inputType = InputType.TYPE_CLASS_PHONE
             setText(prefs.getString("target", ""))
-            singleLine = true
+            isSingleLine = true
         }
         root.addView(etTarget, matchWidth())
         addButtonRow(
