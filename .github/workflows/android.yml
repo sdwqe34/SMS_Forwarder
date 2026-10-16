@@ -1,4 +1,4 @@
-name: Build SMS Forwarder APK
+name: Build and publish SMS Forwarder
 
 on:
   workflow_dispatch:
@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build:
@@ -25,14 +26,23 @@ jobs:
 
       - name: Build debug APK
         working-directory: SmsForwarder
-        run: gradle --no-daemon clean assembleDebug
+        run: gradle --no-daemon clean :app:assembleDebug
 
       - name: Verify APK
         run: test -s SmsForwarder/app/build/outputs/apk/debug/app-debug.apk
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
         with:
           name: sms-forwarder-debug
           path: SmsForwarder/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
+
+      - name: Publish APK to GitHub Packages (Maven)
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[publish-package]')
+        working-directory: SmsForwarder
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gradle --no-daemon publishSmsForwarderApkPublicationToGitHubPackagesRepository

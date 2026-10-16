@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="310" viewBox="0 0 1200 310" role="img" aria-labelledby="title desc">
+ <title id="title">Message forwarding flow / مراحل فوروارد پیامک</title>
+ <desc id="desc">Select a message or sender, pick a recipient, save, then automatic matching messages are forwarded / انتخاب پیام یا فرستنده، انتخاب گیرنده، ذخیره و فوروارد پیامک‌های منطبق</desc>
+ <defs>
+  <linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1686ff"/><stop offset="1" stop-color="#084ca8"/></linearGradient>
+  <linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#27c77b"/><stop offset="1" stop-color="#078b57"/></linearGradient>
+ </defs>
+ <rect width="1200" height="310" rx="24" fill="#f4f9ff"/>
+ <text x="40" y="42" font-family="Arial,sans-serif" font-size="24" font-weight="700" fill="#143554">How it works</text>
+ <text x="1160" y="42" text-anchor="end" font-family="Arial,sans-serif" font-size="24" font-weight="700" fill="#08764c">روش کار</text>
+ <g font-family="Arial,sans-serif">
+  <g transform="translate(32 68)"><rect width="255" height="178" rx="18" fill="#fff" stroke="#d5e5f7"/><circle cx="33" cy="33" r="20" fill="url(#a)"/><text x="33" y="40" font-size="19" font-weight="700" fill="#fff" text-anchor="middle">1</text><text x="63" y="29" font-size="17" font-weight="700" fill="#133554">Select message / sender</text><text x="18" y="70" font-size="15" fill="#496783">From SMS inbox or Contacts</text><text x="18" y="100" font-size="15" fill="#08764c">انتخاب پیام یا فرستنده</text><text x="18" y="124" font-size="13" fill="#496783">For service IDs, select a real SMS.</text><text x="18" y="148" font-size="13" fill="#496783">برای سرشماره، پیام همان سرویس را انتخاب کنید.</text></g>
+  <path d="M294 156h24m-8-8 8 8-8 8" stroke="#7e9ab8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(326 68)"><rect width="255" height="178" rx="18" fill="#fff" stroke="#d5e5f7"/><circle cx="33" cy="33" r="20" fill="url(#a)"/><text x="33" y="40" font-size="19" font-weight="700" fill="#fff" text-anchor="middle">2</text><text x="63" y="29" font-size="17" font-weight="700" fill="#133554">Choose recipient</text><text x="18" y="70" font-size="15" fill="#496783">Contacts, recent SMS, or number</text><text x="18" y="100" font-size="15" fill="#08764c">انتخاب گیرنده</text><text x="18" y="124" font-size="13" fill="#496783">Choose a contact or type a number.</text><text x="18" y="148" font-size="13" fill="#496783">مخاطب را انتخاب یا شماره را وارد کنید.</text></g>
+  <path d="M588 156h24m-8-8 8 8-8 8" stroke="#7e9ab8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(620 68)"><rect width="255" height="178" rx="18" fill="#fff" stroke="#d5e5f7"/><circle cx="33" cy="33" r="20" fill="url(#a)"/><text x="33" y="40" font-size="19" font-weight="700" fill="#fff" text-anchor="middle">3</text><text x="63" y="29" font-size="17" font-weight="700" fill="#133554">Save settings</text><text x="18" y="70" font-size="15" fill="#496783">Enable auto-forwarding explicitly</text><text x="18" y="100" font-size="15" fill="#08764c">ذخیرهٔ تنظیمات</text><text x="18" y="124" font-size="13" fill="#496783">Automatic forwarding starts when enabled.</text><text x="18" y="148" font-size="13" fill="#496783">فوروارد خودکار فقط با فعال‌سازی آغاز می‌شود.</text></g>
+  <path d="M882 156h24m-8-8 8 8-8 8" stroke="#7e9ab8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(914 68)"><rect width="254" height="178" rx="18" fill="#f0fcf6" stroke="#b8edd3"/><circle cx="33" cy="33" r="20" fill="url(#b)"/><path d="M23 33l7 7 14-16" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="63" y="29" font-size="17" font-weight="700" fill="#133554">Forward matching SMS</text><text x="18" y="70" font-size="15" fill="#496783">Other senders are ignored</text><text x="18" y="100" font-size="15" fill="#08764c">فقط پیامک منطبق منتقل می‌شود</text><text x="18" y="124" font-size="13" fill="#496783">Test with a non-sensitive message first.</text><text x="18" y="148" font-size="13" fill="#496783">ابتدا با پیام غیرحساس آزمایش کنید.</text></g>
+ </g>
+</svg>

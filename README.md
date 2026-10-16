@@ -1,73 +1,97 @@
-# SMS Forwarder
+# SMS Forwarder | فوروارد پیامک
 
-An Android app for **selectively forwarding SMS messages**. Choose a sender from your SMS inbox or contacts, choose a destination from contacts, recent SMS senders, or enter a phone number, and decide whether future messages from that sender should be forwarded automatically.
+<div align="center">
+  <img src="docs/images/sms-forwarder-catalog.svg" width="100%" alt="SMS Forwarder app catalog / کاتالوگ برنامه فوروارد پیامک">
+  <br>
+  <b>Choose a message. Choose a recipient. Forward only what you select.</b>
+  <br>
+  <b>پیام را انتخاب کن، گیرنده را مشخص کن و فقط همان پیام‌های موردنظر را فوروارد کن.</b>
+</div>
 
-> **Important:** Selecting a message from the inbox sets its sender as the filter for future incoming messages. You can also send the selected existing message once using **Send this message to recipient**. The app does not automatically forward every SMS from every sender.
+[![Build APK](https://github.com/sdwqe34/SMS_Forwarder/actions/workflows/android.yml/badge.svg)](https://github.com/sdwqe34/SMS_Forwarder/actions/workflows/android.yml)
+[![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)](https://www.android.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## Features
+**English:** SMS Forwarder is an Android app that lets you select a sender from your SMS inbox or contacts, choose a recipient, and forward matching *new incoming messages* automatically. You can also select an existing inbox message and send it once, after confirmation.
 
-- **Selective automatic forwarding:** forward future incoming SMS messages only when the sender matches the saved sender filter.
-- **Choose a sender from the inbox:** selecting a received message fills the filter with the sender address reported by Android, which is useful for service IDs such as `MALIAT`.
-- **Choose a sender from Contacts:** select a contact phone number as the filter.
-- **Choose a recipient:** use a number from Contacts, choose a sender from recent received SMS, or type the destination number manually.
-- **One-time forwarding:** explicitly forward the currently selected existing SMS to the chosen recipient.
-- **Multi-part SMS support:** long messages are split and sent using Android's SMS APIs.
-- **Local configuration:** settings are stored on the device; this app does not need an internet permission or an external server.
+**فارسی:** «SMS Forwarder» برنامه‌ای برای اندروید است که به شما اجازه می‌دهد فرستنده را از فهرست پیامک‌های دریافتی یا مخاطبین انتخاب کنید، گیرنده را مشخص کنید و پیامک‌های جدید همان فرستنده را به‌صورت خودکار انتقال دهید. همچنین می‌توانید یک پیامک قدیمی را انتخاب کرده و پس از تأیید، فقط همان پیام را یک‌بار ارسال کنید.
 
-## How to use
+## Screenshots & visual guide | تصاویر و راهنما
 
-1. Install the APK and open **SMS Forwarder**.
-2. Approve the SMS and Contacts permissions requested by the app.
-3. Under **Select sender**, choose **From SMS** and tap a message from the desired sender, or choose a person from Contacts. You can also type a service ID such as `MALIAT` manually.
-4. Under **Select recipient**, choose a contact, select a sender from recent SMS, or enter the destination phone number with its country code.
-5. Turn on **Automatically forward new SMS from this sender** and tap **Save settings**.
-6. Test with a non-sensitive SMS. Only new incoming messages matching the saved sender filter should be forwarded automatically.
-7. To send the selected old message once, select it in the inbox and tap **Send this message to recipient**. This action asks for confirmation before sending.
+<div align="center">
+  <img src="docs/images/forwarding-flow.svg" width="100%" alt="Forwarding flow / روند انتخاب و فوروارد">
+</div>
 
-## Sender matching notes
+## Features | امکانات
 
-- Selecting a message from the SMS inbox stores the sender address supplied by Android, rather than relying on the contact's display name.
-- For ordinary phone numbers, the app uses Android phone-number comparison and a conservative suffix fallback for country-code formatting differences.
-- Alphanumeric service sender IDs (for example, `MALIAT`) are matched case-insensitively. If a service message is not forwarded, select one of its messages from the SMS inbox and save the settings again. Some carriers may present sender IDs differently.
-- Selecting a contact as the source uses that contact's phone number; it is best for senders that appear as phone numbers, not alphanumeric service IDs.
+| English | فارسی |
+|---|---|
+| Choose a sender from received SMS or Contacts. | انتخاب فرستنده از پیامک‌های دریافتی یا مخاطبین |
+| Choose a recipient from Contacts, recent SMS senders, or enter a number. | انتخاب گیرنده از مخاطبین، فرستنده‌های پیامک اخیر یا ورود دستی شماره |
+| Auto-forward only new messages that match the saved sender. | فوروارد خودکار فقط برای پیامک‌های جدیدِ فرستندهٔ تعیین‌شده |
+| Send one selected existing message manually, with confirmation. | ارسال دستی یک پیامک انتخاب‌شده پس از تأیید |
+| Handles long and multi-part SMS messages. | پشتیبانی از پیامک‌های طولانی و چندبخشی |
+| Settings are stored on-device; no external server is required. | تنظیمات روی گوشی ذخیره می‌شود و سرور خارجی لازم نیست |
 
-## Permissions
+## Quick start | راه‌اندازی سریع
 
-- `RECEIVE_SMS`: receive new SMS broadcasts.
-- `READ_SMS`: show received messages so you can choose a sender or select a message for one-time forwarding.
-- `SEND_SMS`: send the forwarded message.
-- `READ_CONTACTS`: select source or recipient phone numbers from contacts.
-- Battery optimization exemption is optional and can help on some devices where aggressive battery management delays background processing.
+1. Install the APK and open **SMS Forwarder**.  
+   فایل APK را نصب و برنامه را باز کنید.
+2. Grant the SMS and Contacts permissions when prompted.  
+   مجوزهای پیامک و مخاطبین را تأیید کنید.
+3. Under **Select sender**, choose a message from the inbox or a phone-number contact. For text sender IDs such as `MALIAT`, select a message from that sender so Android's reported sender ID is saved.  
+   در بخش «انتخاب فرستنده»، یک پیامک یا مخاطب را انتخاب کنید. برای سرشماره‌های متنی مثل `MALIAT`، بهتر است پیامک همان سرویس را مستقیماً از صندوق انتخاب کنید.
+4. Choose the recipient from Contacts, recent SMS senders, or enter the phone number with country code.  
+   گیرنده را از مخاطبین، پیامک‌های اخیر یا با واردکردن شماره همراه کد کشور انتخاب کنید.
+5. For future messages, turn on **Automatically forward new SMS from this sender**, then press **Save settings**.  
+   برای فوروارد پیامک‌های آینده، گزینهٔ فوروارد خودکار را روشن و «ذخیره تنظیمات» را انتخاب کنید.
+6. To send an existing message only once, select it from the inbox and tap **Send this message to recipient**; review and confirm.  
+   برای ارسال یک پیام قدیمی، آن را انتخاب کنید، «ارسال همین پیام» را بزنید و تأیید کنید.
 
-Only grant permissions if you understand why the app needs them. Message content and contact details are sensitive; use this app only with messages and destinations you are authorized to forward. Forwarding can incur carrier SMS charges.
+> **Important / مهم:** Automatic forwarding is off by default. Other senders are ignored. Only forward messages you are authorized to share; SMS forwarding may expose private or one-time-password information and carrier charges may apply.  
+> فوروارد خودکار به‌صورت پیش‌فرض خاموش است و پیامک‌های سایر فرستنده‌ها نادیده گرفته می‌شوند. فقط پیام‌هایی را منتقل کنید که اجازهٔ انتقالشان را دارید؛ پیامک‌ها ممکن است حاوی اطلاعات خصوصی یا کد یک‌بارمصرف باشند و هزینهٔ اپراتور اعمال شود.
 
-## Troubleshooting
+## Troubleshooting | عیب‌یابی
 
-- **Nothing is forwarded:** verify that automatic forwarding is enabled, press **Save settings**, confirm the sender and destination, and ensure SMS permissions are granted.
-- **A service sender does not match:** select an SMS from that service directly in the inbox so the app stores the originating address Android reports, then save the settings.
-- **Permission prompts were denied:** tap **SMS and Contacts permissions** in the app or re-enable them in Android Settings → Apps → SMS Forwarder → Permissions.
-- **Background delivery is delayed:** check your phone's battery restrictions and allow background activity for the app.
-- **Destination receives no SMS:** verify the phone number and country code, SIM service, SMS balance/plan, and that the device has network coverage.
+- **No automatic forward / فوروارد انجام نمی‌شود:** verify the sender, destination, permissions, and enabled switch; then save settings again.  
+  فرستنده، گیرنده، مجوزها و روشن‌بودن فوروارد خودکار را بررسی و تنظیمات را دوباره ذخیره کنید.
+- **A service sender such as MALIAT does not match / سرشمارهٔ متنی شناسایی نمی‌شود:** select a message from that sender directly in the inbox, then save the settings. Carriers can represent sender IDs differently.  
+  پیامک همان سرویس را مستقیماً از صندوق انتخاب و تنظیمات را ذخیره کنید؛ نمایش سرشماره به اپراتور وابسته است.
+- **Permissions denied / مجوزها رد شده‌اند:** enable SMS and Contacts permissions under Android Settings → Apps → SMS Forwarder.  
+  از تنظیمات اندروید ← برنامه‌ها ← SMS Forwarder مجوزها را فعال کنید.
+- **Background delivery is delayed / تأخیر در پس‌زمینه:** check the phone's battery optimization settings. Actual SMS delivery depends on the SIM, carrier, coverage, and account balance.  
+  محدودیت باتری را بررسی کنید. تحویل واقعی پیامک به سیم‌کارت، اپراتور، آنتن‌دهی و اعتبار حساب بستگی دارد.
 
-The app logs forwarding failures under the `SmsReceiver` tag, which can be inspected with Android logcat during debugging. A successful build does not guarantee delivery by the mobile carrier; always test on your own device.
+## Download | دریافت برنامه
 
-## Build from source
+- **Test APK / نسخهٔ آزمایشی:** open the latest successful [Build APK workflow](https://github.com/sdwqe34/SMS_Forwarder/actions/workflows/android.yml) and download the `sms-forwarder-debug` artifact.
+- **GitHub Packages / بستهٔ منتشرشده:** [Open the account's Packages page](https://github.com/users/sdwqe34/packages?repo_name=SMS_Forwarder). Package publishing runs when a commit explicitly marked for publishing completes successfully.
 
-The Android project is in the `SmsForwarder/` directory. Open that directory in Android Studio, or install JDK 17 and Gradle 8.7 and run:
+## Build from source | ساخت از سورس
+
+Requires JDK 17 and Gradle 8.7. The Android project is in `SmsForwarder/`.
 
 ```bash
 cd SmsForwarder
-gradle --no-daemon assembleDebug
+gradle --no-daemon clean assembleDebug
 ```
 
-The debug APK is generated at:
+The APK is generated at `app/build/outputs/apk/debug/app-debug.apk`.
 
-```
-SmsForwarder/app/build/outputs/apk/debug/app-debug.apk
-```
+برای ساخت برنامه به JDK 17 و Gradle 8.7 نیاز دارید. پوشهٔ `SmsForwarder` را در Android Studio باز کنید یا دستورات بالا را اجرا کنید؛ فایل خروجی در `SmsForwarder/app/build/outputs/apk/debug/app-debug.apk` قرار می‌گیرد.
 
-GitHub Actions also builds a debug APK on pushes to `main` and `master`. Open the repository's **Actions → Build APK** workflow and download the `sms-forwarder-maliat-debug` artifact from the latest successful run.
+## Privacy & permissions | حریم خصوصی و مجوزها
 
-## App description
+- `RECEIVE_SMS`: receive new SMS broadcasts / دریافت اعلان پیامک جدید
+- `READ_SMS`: list inbox messages for selection / نمایش فهرست پیامک‌ها
+- `SEND_SMS`: send selected or matching messages / ارسال پیامک
+- `READ_CONTACTS`: choose contacts / انتخاب مخاطب
 
-**SMS Forwarder** lets you select the sender you care about from your SMS inbox or Contacts, select the intended recipient, and forward only matching incoming messages automatically. You can also send one selected existing message manually. The application is designed to keep the selection and forwarding rules explicit, reducing accidental forwarding of unrelated messages.
+The app has no Internet permission and stores configuration locally. These permissions grant access to sensitive information, so review them carefully. A successful build does not guarantee delivery by the carrier; test with a non-sensitive message first.
+
+این برنامه مجوز اینترنت ندارد و تنظیمات را روی دستگاه ذخیره می‌کند. مجوزها به اطلاعات حساسی دسترسی می‌دهند؛ پیش از استفاده آن‌ها را بررسی کنید و ابتدا با یک پیامک غیرحساس آزمایش کنید.
+
+## License | مجوز
+
+MIT — see [LICENSE](LICENSE).  
+مجوز MIT — متن کامل در فایل [LICENSE](LICENSE) قرار دارد.
