@@ -11,7 +11,7 @@ publishing {
         create<MavenPublication>("smsForwarderApk") {
             groupId = "io.github.sdwqe34"
             artifactId = "sms-forwarder"
-            version = "1.2.0"
+            version = "1.3.0"
 
             artifact(file("app/build/outputs/apk/debug/app-debug.apk")) {
                 extension = "apk"
@@ -20,7 +20,7 @@ publishing {
 
             pom {
                 name.set("SMS Forwarder")
-                description.set("Android app for selective SMS forwarding")
+                description.set("Bilingual Android app for selective SMS forwarding with local send history")
                 url.set("https://github.com/sdwqe34/SMS_Forwarder")
             }
         }

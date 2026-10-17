@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SMS Forwarder</string>
-    <string name="app_description">Select a sender from your SMS inbox or contacts, then automatically forward new messages from that sender to your chosen recipient. You can also send a selected existing SMS manually.</string>
+    <string name="app_description">Select a sender from your SMS inbox or contacts, then forward matching incoming messages to your chosen recipient. Includes local send history and Persian/English UI.</string>
 </resources>
