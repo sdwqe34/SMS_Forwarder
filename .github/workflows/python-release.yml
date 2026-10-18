@@ -1,0 +1,72 @@
+name: Release Python rules library
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Python package release tag (for example python-v0.1.0)"
+        required: true
+        default: "python-v0.1.0"
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/python-release.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-release:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-python]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build and test tools
+        working-directory: python
+        run: python -m pip install --upgrade pip build pytest
+
+      - name: Run tests
+        working-directory: python
+        run: python -m pytest -v
+
+      - name: Build source and wheel distributions
+        working-directory: python
+        run: python -m build
+
+      - name: Prepare release assets
+        env:
+          RELEASE_TAG: ${{ inputs.tag || 'python-v0.1.0' }}
+        run: |
+          set -euo pipefail
+          mkdir -p python-release-assets
+          cp python/dist/*.whl python-release-assets/
+          cp python/dist/*.tar.gz python-release-assets/
+          cd python-release-assets
+          sha256sum *.whl *.tar.gz > SHA256SUMS
+
+      - name: Publish Python distributions on GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || 'python-v0.1.0' }}
+          target_commitish: main
+          name: SMS Forwarder Python Rules ${{ inputs.tag || 'python-v0.1.0' }}
+          body: |
+            Python rules library distribution.
+
+            The package defines and matches forwarding rules and returns planned destinations. It does not read an Android device inbox, send SMS, or directly deliver messages through email or consumer messenger services. Actual delivery must be implemented by the host application.
+          files: |
+            python-release-assets/*.whl
+            python-release-assets/*.tar.gz
+            python-release-assets/SHA256SUMS
+          draft: false
+          prerelease: false
