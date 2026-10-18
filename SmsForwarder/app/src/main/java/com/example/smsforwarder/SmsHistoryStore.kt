@@ -42,6 +42,14 @@ object SmsHistoryStore {
     }
 
     @Synchronized
+    fun queued(context: Context, id: String, detail: String) {
+        update(context, id) { entry ->
+            entry.put("status", "queued")
+            entry.put("detail", detail)
+        }
+    }
+
+    @Synchronized
     fun fail(context: Context, id: String, reason: String) {
         update(context, id) { entry ->
             entry.put("status", "failed")
