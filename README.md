@@ -36,7 +36,7 @@ The illustrations are editorial product diagrams, not screenshots of a running d
 | **Optional content filters:** route only messages containing a phrase, and/or exclude messages containing another phrase. Matching is case-insensitive. | **فیلتر متن اختیاری:** فقط پیام‌های دارای یک عبارت را منتقل کن و/یا پیام‌های دارای عبارت دیگر را مستثنا کن؛ بررسی متن به بزرگی و کوچکی حروف حساس نیست. |
 | **Choose one or multiple channels per rule:** SMS, Email, Telegram, WhatsApp, Bale and Eitaa. | **انتخاب یک یا چند کانال برای هر قانون:** پیامک، ایمیل، تلگرام، واتساپ، بله و ایتا. |
 | Dedicated Rules page to add, edit, enable, pause and delete rules. | صفحه‌ی اختصاصی «قوانین» برای افزودن، ویرایش، فعال‌سازی، توقف و حذف قانون‌ها. |
-| Non-SMS forwarding handoffs with an Android notification, message preview and explicit user confirmation. | واگذاری انتقال غیرپیامکی با اعلان اندروید، پیش‌نمایش پیام و تأیید صریح کاربر. |
+| Non-SMS forwarding handoffs with an Android notification, a prepared message flow and explicit user confirmation. | واگذاری انتقال غیرپیامکی با اعلان اندروید، پیش‌نمایش پیام و تأیید صریح کاربر. |
 | Local history for SMS send attempts and notification-based channel handoffs. | تاریخچه‌ی محلی برای تلاش‌های ارسال پیامک و واگذاری انتقال به کانال‌های دیگر. |
 | Existing single-rule settings are retained and represented in the Rules manager when a user starts using the new rule model. | تنظیمات قانون تک‌گانه‌ی قبلی حفظ می‌شود و با شروع استفاده از مدل جدید، در مدیریت قوانین نیز نمایش داده خواهد شد. |
 | Persian/English interface and clearer permission guidance. | رابط فارسی/انگلیسی و راهنمای شفاف‌تر مجوزها. |
