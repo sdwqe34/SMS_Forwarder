@@ -417,7 +417,7 @@ class MainActivity : Activity() {
         val rules = ForwardingRuleStore.all(this)
         val listCard = card(parent)
         label(listCard, t("Saved rules", "قوانین ذخیره‌شده"), 17f, navy, true)
-        label(listCard, t("$(rules.size) rule(s)", "$(rules.size) قانون"), 11f, muted)
+        label(listCard, t("Rule count: ", "تعداد قانون: ") + rules.size.toString(), 11f, muted)
         addButton(listCard, t("+ Add a rule", "+ افزودن قانون جدید")) {
             editingRuleId = null
             editingRuleDraft = null
@@ -836,7 +836,9 @@ class MainActivity : Activity() {
             Manifest.permission.READ_SMS,
             Manifest.permission.SEND_SMS,
             Manifest.permission.READ_CONTACTS
-        ).filterNot { hasPermission(it) }
+        ).toMutableList().apply {
+            if (android.os.Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
+        }.filterNot { hasPermission(it) }
         if (missing.isEmpty()) {
             toast(t("SMS and Contacts permissions are granted.", "مجوزهای پیامک و مخاطبین فعال‌اند."))
             render()
