@@ -17,9 +17,11 @@ object ForwardingChannelNotifier {
     private const val CHANNEL_ID = "forwarding_handoffs"
 
     fun post(context: Context, source: String, channel: String, target: String, body: String) {
+        val recordId = SmsHistoryStore.add(context, source, target, body, "handoff_$channel", 1)
         if (Build.VERSION.SDK_INT >= 33 &&
             context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
+            SmsHistoryStore.fail(context, recordId, "Notification permission is not granted; no handoff notification was shown.")
             Log.w(TAG, "Notification permission is not granted; cannot hand off $channel delivery.")
             return
         }
@@ -72,9 +74,16 @@ object ForwardingChannelNotifier {
                 .setAutoCancel(true)
                 .build()
             manager.notify(requestCode, notification)
+            SmsHistoryStore.queued(
+                context,
+                recordId,
+                "Notification posted for $channel. Final sending requires user confirmation inside the target app."
+            )
         } catch (e: SecurityException) {
+            SmsHistoryStore.fail(context, recordId, "Unable to post forwarding notification.")
             Log.w(TAG, "Unable to post forwarding notification", e)
         } catch (e: Exception) {
+            SmsHistoryStore.fail(context, recordId, e.localizedMessage ?: "Unable to prepare $channel handoff.")
             Log.e(TAG, "Unable to prepare $channel handoff", e)
         }
     }
