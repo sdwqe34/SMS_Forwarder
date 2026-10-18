@@ -1,0 +1,70 @@
+name: Publish SMS Forwarder Android SDK
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "New SDK release tag (for example sdk-v1.0.0)"
+        required: true
+        default: "sdk-v1.0.0"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.7
+
+      - name: Validate tag
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^sdk-v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+
+      - name: Build and test Android SDK
+        working-directory: SmsForwarder
+        run: gradle --no-daemon clean :sdk:testDebugUnitTest :sdk:assembleRelease
+
+      - name: Prepare SDK release and checksum
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          test -s SmsForwarder/sdk/build/outputs/aar/sdk-release.aar
+          mkdir -p sdk-release-assets
+          cp SmsForwarder/sdk/build/outputs/aar/sdk-release.aar "sdk-release-assets/sms-forwarder-sdk-${RELEASE_TAG#sdk-v}.aar"
+          cd sdk-release-assets
+          sha256sum *.aar > SHA256SUMS
+
+      - name: Publish SDK release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          target_commitish: main
+          name: SMS Forwarder Android SDK ${{ inputs.tag }}
+          body: |
+            Android SDK release containing reusable sender matching, optional text filters and multi-channel delivery planning.
+
+            The SDK only returns routing plans. The consuming Android app must implement transport delivery and obtain all necessary platform permissions. This is not a standalone SMS receiver or a messenger API integration.
+          files: |
+            sdk-release-assets/*.aar
+            sdk-release-assets/SHA256SUMS
+          draft: false
+          prerelease: false
