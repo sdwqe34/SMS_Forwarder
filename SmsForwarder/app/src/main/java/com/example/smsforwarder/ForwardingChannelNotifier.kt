@@ -46,7 +46,7 @@ object ForwardingChannelNotifier {
                 putExtra(MainActivity.EXTRA_DELIVERY_TARGET, target)
                 putExtra(MainActivity.EXTRA_DELIVERY_BODY, body)
             }
-            val requestCode = ("$channel|$source|$target|$body").hashCode() and 0x7fffffff
+            val requestCode = ("$channel|$recordId").hashCode() and 0x7fffffff
             val flags = PendingIntent.FLAG_UPDATE_CURRENT or
                 (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0)
             val pendingIntent = PendingIntent.getActivity(context, requestCode, intent, flags)
@@ -68,8 +68,9 @@ object ForwardingChannelNotifier {
             val notification = builder
                 .setSmallIcon(android.R.drawable.ic_dialog_email)
                 .setContentTitle("SMS Forwarder · $channelName")
-                .setContentText("$summary — tap to prepare the message")
-                .setStyle(Notification.BigTextStyle().bigText("$summary\n${body.take(280)}"))
+                .setContentText("A message is ready for your review. Tap to continue.")
+                .setStyle(Notification.BigTextStyle().bigText("$summary\nTap to prepare the message in the selected app."))
+                .setVisibility(Notification.VISIBILITY_PRIVATE)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build()
