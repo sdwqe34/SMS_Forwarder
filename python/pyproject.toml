@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sms-forwarder-rules"
+version = "0.1.0"
+description = "A dependency-free rules engine for matching messages and planning multi-channel forwarding."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "SMS Forwarder contributors"}]
+keywords = ["sms", "forwarding", "routing", "rules", "messaging", "automation"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Communications",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/sdwqe34/SMS_Forwarder"
+Repository = "https://github.com/sdwqe34/SMS_Forwarder"
+Issues = "https://github.com/sdwqe34/SMS_Forwarder/issues"
+Changelog = "https://github.com/sdwqe34/SMS_Forwarder/releases"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sms_forwarder*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
