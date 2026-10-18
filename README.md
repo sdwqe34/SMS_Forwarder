@@ -153,6 +153,8 @@ After the package has been published to PyPI:
 
     python -m pip install sms-forwarder-rules
 
+Until the PyPI Trusted Publisher is configured, download the published [Python wheel and source distribution from GitHub Releases](https://github.com/sdwqe34/SMS_Forwarder/releases/tag/python-v0.1.0). The wheel can be installed directly with pip using its release URL.
+
 See the [Python package README](python/README.md) and [PyPI publishing setup](python/PUBLISHING.md).
 
 **Important:** both libraries return routing plans. Actual SMS delivery requires a host Android application with the appropriate permissions. Email and consumer messenger delivery require a supported provider API or a user-confirmed handoff. Neither library alone sends messages to Telegram, WhatsApp, Bale or Eitaa.
