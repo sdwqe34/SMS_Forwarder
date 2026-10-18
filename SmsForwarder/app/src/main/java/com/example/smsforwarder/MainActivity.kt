@@ -741,8 +741,8 @@ class MainActivity : Activity() {
         }
         val version = try {
             @Suppress("DEPRECATION")
-            packageManager.getPackageInfo(packageName, 0).versionName ?: "1.3.0"
-        } catch (_: Exception) { "1.3.0" }
+            packageManager.getPackageInfo(packageName, 0).versionName ?: "1.4.0"
+        } catch (_: Exception) { "1.4.0" }
         label(about, t("Version ", "نسخه ") + version, 12f, muted)
         label(about, t(
             "Preferences and send history are stored locally. No external server or Internet permission is required.",
