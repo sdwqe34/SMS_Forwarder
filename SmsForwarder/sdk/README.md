@@ -30,6 +30,12 @@ This Android library exposes reusable routing models and a deterministic rule-ma
 
 The result is a list of delivery-plan objects. The host app chooses whether and how to carry each delivery out.
 
+## Download the AAR
+
+A tested release AAR is available here:
+- [Download sms-forwarder-sdk-1.0.0.aar](https://github.com/sdwqe34/SMS_Forwarder/releases/download/sdk-v1.0.0/sms-forwarder-sdk-1.0.0.aar)
+- [Release notes and SHA-256 checksum](https://github.com/sdwqe34/SMS_Forwarder/releases/tag/sdk-v1.0.0)
+
 ## Add it to an Android app
 
 After the SDK tag has been published, add JitPack to the host project's repositories:
