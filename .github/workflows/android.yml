@@ -4,13 +4,15 @@ on:
   workflow_dispatch:
   push:
     branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 permissions:
   contents: write
   packages: write
 
 env:
-  APP_VERSION: 1.3.0
+  APP_VERSION: 1.4.0
 
 jobs:
   build:
@@ -35,7 +37,7 @@ jobs:
         run: |
           set -euo pipefail
           test -s SmsForwarder/app/build/outputs/apk/debug/app-debug.apk
-          test "$(grep -c 'versionName = "1.3.0"' SmsForwarder/app/build.gradle.kts)" -eq 1
+          test "$(grep -c 'versionName = "1.4.0"' SmsForwarder/app/build.gradle.kts)" -eq 1
 
       - name: Upload installable APK
         uses: actions/upload-artifact@v4
@@ -78,31 +80,32 @@ jobs:
       - name: Publish GitHub Release with direct APK download
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.3.0
+          tag_name: v1.4.0
           target_commitish: ${{ github.sha }}
-          name: SMS Forwarder v1.3.0
+          name: SMS Forwarder v1.4.0
           body: |
             ## English
-            Bilingual Persian/English redesign with a clearer permission flow and local SMS send history.
-            - Select sender and destination from SMS inbox, Contacts, or enter a number.
-            - Enable auto-forwarding after saving a selected sender and destination.
-            - Send a selected existing message once after confirmation.
-            - Review source, destination, message content, timestamp, mode, and Android send callback status in History.
-            - Permission help explains Android hard-restricted SMS permissions and the limits of “Allow restricted settings”.
-            - This is a debug-signed APK for testing. “Sent to network” is not proof of final recipient delivery.
-            - Test on real hardware and review permissions before use.
+            Multi-rule and multi-channel source update.
+            - Create independent forwarding rules for different sender IDs/numbers.
+            - Optionally require a phrase and/or exclude messages containing a phrase.
+            - Select one or more channels per rule: SMS, Email, Telegram, WhatsApp, Bale and Eitaa.
+            - Automatic SMS is subject to Android SMS permissions and device restrictions.
+            - Email and messenger channels use notification-based, user-confirmed handoffs; they do not silently send in the background.
+            - Local history distinguishes SMS callback status from non-SMS handoff status. Neither is proof of final recipient delivery.
+            - The APK built by this workflow is debug-signed for testing, not a production-signed Play Store package.
 
             ## فارسی
-            بازطراحی دوزبانه فارسی/انگلیسی همراه با راهنمای روشن‌تر مجوزها و تاریخچه محلی پیامک.
-            - انتخاب فرستنده و گیرنده از صندوق پیامک، مخاطبین یا ورود دستی شماره.
-            - فعال‌سازی فوروارد خودکار پس از ذخیره قانون فرستنده و گیرنده.
-            - ارسال یک‌باره پیام انتخاب‌شده پس از تأیید.
-            - نمایش مبدأ، مقصد، متن پیام، زمان، نوع ارسال و وضعیت بازگشتی اندروید در سوابق محلی.
-            - توضیحات برنامه محدودیت مجوزهای سخت‌محدودشده و محدودیت گزینه «Allow restricted settings» را شرح می‌دهد.
-            - این APK با امضای Debug برای آزمایش ساخته شده است؛ «ارسال‌شده به شبکه» به معنی تأیید تحویل نهایی نیست.
+            به‌روزرسانی قوانین چندگانه و روش‌های متنوع انتقال.
+            - تعریف قوانین مستقل برای شناسه‌ها و شماره‌های فرستنده‌ی متفاوت.
+            - شرط اختیاری شامل بودن و/یا مستثنا کردن عبارت از متن پیام.
+            - انتخاب یک یا چند روش برای هر قانون: پیامک، ایمیل، تلگرام، واتساپ، بله و ایتا.
+            - ارسال خودکار پیامک به مجوزهای اندروید و محدودیت‌های دستگاه وابسته است.
+            - ایمیل و پیام‌رسان‌ها از طریق اعلان و واگذاری مورد تأیید کاربر کار می‌کنند و در پس‌زمینه بی‌صدا ارسال ندارند.
+            - تاریخچه‌ی محلی وضعیت callback پیامک را از واگذاری کانال‌های دیگر جدا می‌کند؛ هیچ‌یک تأیید قطعی تحویل به گیرنده نیست.
+            - APK این گردش‌کار با امضای Debug برای آزمایش ساخته می‌شود، نه به‌عنوان بسته‌ی تولیدی Play Store.
           files: |
-            release-assets/SMS-Forwarder-1.3.0.apk
-            release-assets/SMS-Forwarder-1.3.0.apk.sha256
+            release-assets/SMS-Forwarder-1.4.0.apk
+            release-assets/SMS-Forwarder-1.4.0.apk.sha256
           draft: false
           prerelease: false
           make_latest: true
