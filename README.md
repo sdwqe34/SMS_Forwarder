@@ -116,6 +116,44 @@ Helpful Android documentation:
 - واگذاری‌های غیرپیامکی تا زمان اقدام کاربر در حالت انتظار می‌مانند؛ برنامه نمی‌تواند بفهمد کاربر در نهایت دکمه‌ی ارسال را زده یا سرویس ثالث پیام را تحویل داده است.
 - برنامه مجوز اینترنت را در Manifest اعلام نمی‌کند. هزینه‌ی پیامک اپراتور ممکن است اعمال شود.
 
+## Reuse the routing engine | استفاده از موتور قوانین در پروژه‌های دیگر
+
+SMS Forwarder now includes two separate developer libraries. They expose message-routing logic; they do not silently read the host device's SMS inbox or implement third-party transports.
+
+### Android SDK (AAR)
+
+The Android library lives in `SmsForwarder/sdk/`. It provides rule models, sender matching, optional case-insensitive text filters and a list of planned deliveries.
+
+After an SDK-specific release has been created, add JitPack to your Android project's repositories:
+
+    dependencyResolutionManagement {
+        repositories {
+            google()
+            mavenCentral()
+            maven { url = uri("https://jitpack.io") }
+        }
+    }
+
+Then add the versioned dependency:
+
+    dependencies {
+        implementation("com.github.sdwqe34.SMS_Forwarder:sdk:sdk-v1.0.0")
+    }
+
+The coordinates above will resolve only after the corresponding SDK tag is available and the JitPack build succeeds. You can also download the AAR from the SDK-specific GitHub Release. See [Android SDK integration instructions](SmsForwarder/sdk/README.md).
+
+### Python rules library
+
+The independent Python package is in `python/`. It exposes the same core concepts: `ForwardingRule`, `IncomingMessage`, `DeliveryChannel` and `plan_deliveries`.
+
+After the package has been published to PyPI:
+
+    python -m pip install sms-forwarder-rules
+
+See the [Python package README](python/README.md) and [PyPI publishing setup](python/PUBLISHING.md).
+
+**Important:** both libraries return routing plans. Actual SMS delivery requires a host Android application with the appropriate permissions. Email and consumer messenger delivery require a supported provider API or a user-confirmed handoff. Neither library alone sends messages to Telegram, WhatsApp, Bale or Eitaa.
+
 ## Download | دریافت برنامه
 
 - **Release v1.4.0 APK:** [SMS-Forwarder-1.4.0.apk](https://github.com/sdwqe34/SMS_Forwarder/releases/download/v1.4.0/SMS-Forwarder-1.4.0.apk)
