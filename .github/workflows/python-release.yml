@@ -51,6 +51,13 @@ jobs:
         working-directory: python
         run: python -m build
 
+      - name: Verify wheel and source distribution exist
+        working-directory: python
+        run: |
+          set -euo pipefail
+          test "$(find dist -maxdepth 1 -name '*.whl' | wc -l)" -eq 1
+          test "$(find dist -maxdepth 1 -name '*.tar.gz' | wc -l)" -eq 1
+
       - name: Prepare release assets
         env:
           RELEASE_TAG: ${{ inputs.tag || 'python-v0.1.0' }}
