@@ -35,6 +35,22 @@ object ForwardingRuleStore {
             .getString(KEY_RULES, "[]") ?: "[]"
         return try {
             val array = JSONArray(raw)
+            if (array.length() == 0) {
+                val legacyPrefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                val legacySource = legacyPrefs.getString("source", "").orEmpty().trim()
+                val legacyTarget = legacyPrefs.getString("target", "").orEmpty().trim()
+                if (legacySource.isNotBlank() && legacyTarget.isNotBlank()) {
+                    return listOf(
+                        ForwardingRule(
+                            id = "legacy-single-rule",
+                            source = legacySource,
+                            channels = setOf(SMS),
+                            destinations = mapOf(SMS to legacyTarget),
+                            enabled = legacyPrefs.getBoolean("enabled", false)
+                        )
+                    )
+                }
+            }
             buildList {
                 for (index in 0 until array.length()) {
                     val item = array.optJSONObject(index) ?: continue
