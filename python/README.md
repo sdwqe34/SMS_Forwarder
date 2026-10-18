@@ -10,6 +10,10 @@ After the project has been published to PyPI:
 
     python -m pip install sms-forwarder-rules
 
+Until PyPI publishing is enabled, the built wheel can be installed directly from GitHub:
+
+    python -m pip install https://github.com/sdwqe34/SMS_Forwarder/releases/download/python-v0.1.0/sms_forwarder_rules-0.1.0-py3-none-any.whl
+
 ## Quick start
 
     from sms_forwarder import DeliveryChannel, ForwardingRule, IncomingMessage, plan_deliveries
