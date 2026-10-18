@@ -28,6 +28,7 @@ object ForwardingRuleStore {
 
     private const val PREFS = "cfg"
     private const val KEY_RULES = "forwarding_rules_v2"
+    private const val KEY_LEGACY_SUPPRESSED = "legacy_rule_suppressed"
 
     @Synchronized
     fun all(context: Context): List<ForwardingRule> {
@@ -39,7 +40,8 @@ object ForwardingRuleStore {
                 val legacyPrefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 val legacySource = legacyPrefs.getString("source", "").orEmpty().trim()
                 val legacyTarget = legacyPrefs.getString("target", "").orEmpty().trim()
-                if (legacySource.isNotBlank() && legacyTarget.isNotBlank()) {
+                if (!legacyPrefs.getBoolean(KEY_LEGACY_SUPPRESSED, false) &&
+                    legacySource.isNotBlank() && legacyTarget.isNotBlank()) {
                     return listOf(
                         ForwardingRule(
                             id = "legacy-single-rule",
@@ -85,12 +87,22 @@ object ForwardingRuleStore {
 
     @Synchronized
     fun save(context: Context, rule: ForwardingRule) {
+        if (rule.id == "legacy-single-rule") {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putBoolean(KEY_LEGACY_SUPPRESSED, false)
+                .apply()
+        }
         val rules = all(context).filterNot { it.id == rule.id } + rule
         persist(context, rules)
     }
 
     @Synchronized
     fun delete(context: Context, id: String) {
+        if (id == "legacy-single-rule") {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putBoolean(KEY_LEGACY_SUPPRESSED, true)
+                .apply()
+        }
         persist(context, all(context).filterNot { it.id == id })
     }
 
