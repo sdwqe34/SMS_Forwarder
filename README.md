@@ -122,6 +122,9 @@ SMS Forwarder now includes two separate developer libraries. They expose message
 
 ### Android SDK (AAR)
 
+- **Direct AAR download:** [sms-forwarder-sdk-1.0.0.aar](https://github.com/sdwqe34/SMS_Forwarder/releases/download/sdk-v1.0.0/sms-forwarder-sdk-1.0.0.aar)
+- **SDK release and SHA-256:** [SMS Forwarder Android SDK sdk-v1.0.0](https://github.com/sdwqe34/SMS_Forwarder/releases/tag/sdk-v1.0.0)
+
 The Android library lives in `SmsForwarder/sdk/`. It provides rule models, sender matching, optional case-insensitive text filters and a list of planned deliveries.
 
 After an SDK-specific release has been created, add JitPack to your Android project's repositories:
