@@ -11,7 +11,7 @@ publishing {
         create<MavenPublication>("smsForwarderApk") {
             groupId = "io.github.sdwqe34"
             artifactId = "sms-forwarder"
-            version = "1.3.0"
+            version = "1.4.0"
 
             artifact(file("app/build/outputs/apk/debug/app-debug.apk")) {
                 extension = "apk"
