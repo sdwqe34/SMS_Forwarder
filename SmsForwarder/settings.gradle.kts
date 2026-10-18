@@ -12,4 +12,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "SmsForwarder"
-include(":app")
+include(":app", ":sdk")
