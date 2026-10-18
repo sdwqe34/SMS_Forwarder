@@ -355,8 +355,8 @@ class MainActivity : Activity() {
         }
         ruleCard.addView(autoSwitch, matchWidth())
         label(ruleCard, t(
-            "Only the saved sender is matched. Other senders are ignored.",
-            "فقط فرستنده‌ی ذخیره‌شده بررسی می‌شود؛ سایر فرستنده‌ها نادیده گرفته می‌شوند."
+            "This screen keeps one legacy SMS rule. Use Rules for independent multi-sender and multi-channel automation.",
+            "این صفحه یک قانون قدیمی پیامکی را مدیریت می‌کند؛ برای قوانین مستقل و چندروش ارسال، از تب «قوانین» استفاده کن."
         ), 11f, muted)
         addButton(ruleCard, t("Save forwarding rule", "ذخیره قانون فوروارد")) { saveSettings() }
 
@@ -659,16 +659,20 @@ class MainActivity : Activity() {
             records.forEach { item ->
                 val itemCard = card(parent, 14)
                 val status = item.optString("status", "queued")
+                val mode = item.optString("mode", "manual")
                 val statusColor = when (status) {
                     "sent" -> teal
                     "failed" -> red
                     else -> amber
                 }
-                label(itemCard, statusLabel(status), 12f, statusColor, true)
+                val statusText = if (mode.startsWith("handoff_") && status == "queued")
+                    t("Waiting for user confirmation", "در انتظار تأیید و ارسال توسط کاربر")
+                else statusLabel(status)
+                label(itemCard, statusText, 12f, statusColor, true)
                 label(itemCard, t("From", "مبدأ") + ": " + item.optString("source", "—"), 12f, navy, true)
                 label(itemCard, t("To", "مقصد") + ": " + item.optString("target", "—"), 12f, navy, true)
                 label(itemCard, t("Date & time", "تاریخ و زمان") + ": " + formatTimestamp(item.optLong("timestamp")), 11f, muted)
-                label(itemCard, t("Type", "نوع") + ": " + modeLabel(item.optString("mode", "manual")), 11f, muted)
+                label(itemCard, t("Type", "نوع") + ": " + modeLabel(mode), 11f, muted)
                 val bodyBox = LinearLayout(this).apply {
                     orientation = LinearLayout.VERTICAL
                     setPadding(dp(10), dp(8), dp(10), dp(8))
@@ -817,6 +821,7 @@ class MainActivity : Activity() {
                     getSharedPreferences("cfg", Context.MODE_PRIVATE).edit()
                         .putString("source", draftSource).putString("target", draftTarget)
                         .putBoolean("enabled", false).apply()
+                    syncLegacyRuleToManagedStore()
                     render()
                 }.show()
             return
@@ -826,8 +831,28 @@ class MainActivity : Activity() {
             .putString("target", draftTarget)
             .putBoolean("enabled", draftEnabled)
             .apply()
+        syncLegacyRuleToManagedStore()
         toast(t("Forwarding rule saved.", "قانون فوروارد ذخیره شد."))
         render()
+    }
+
+    private fun syncLegacyRuleToManagedStore() {
+        val source = draftSource.trim()
+        val target = draftTarget.trim()
+        if (source.isBlank() || target.isBlank()) {
+            ForwardingRuleStore.delete(this, "legacy-single-rule")
+            return
+        }
+        ForwardingRuleStore.save(
+            this,
+            ForwardingRule(
+                id = "legacy-single-rule",
+                source = source,
+                channels = setOf(ForwardingRuleStore.SMS),
+                destinations = mapOf(ForwardingRuleStore.SMS to target),
+                enabled = draftEnabled
+            )
+        )
     }
 
     private fun requestRequiredPermissions() {
@@ -1142,9 +1167,12 @@ class MainActivity : Activity() {
         else -> t("Queued", "در صف")
     }
 
-    private fun modeLabel(mode: String): String =
-        if (mode == "automatic") t("Automatic forwarding", "فوروارد خودکار")
-        else t("Manual one-time send", "ارسال دستی یک‌باره")
+    private fun modeLabel(mode: String): String = when {
+        mode == "automatic" -> t("Automatic SMS forwarding", "فوروارد خودکار پیامک")
+        mode.startsWith("handoff_") -> t("User-confirmed handoff: ", "واگذاری برای تأیید کاربر: ") +
+            channelLabel(mode.removePrefix("handoff_"))
+        else -> t("Manual one-time send", "ارسال دستی یک‌باره")
+    }
 
     private fun formatTimestamp(timestamp: Long): String =
         if (timestamp <= 0) "—" else DateFormat.getDateTimeInstance(
