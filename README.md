@@ -1,149 +1,148 @@
-# SMS Forwarder 1.3.0 | فوروارد پیامک ۱.۳.۰
+# SMS Forwarder 1.4.0 | فوروارد پیامک
 
 <div align="center">
-  <img src="docs/images/sms-forwarder-catalog.svg" width="100%" alt="SMS Forwarder 1.3.0 bilingual interface preview / پیش‌نمایش رابط دوزبانه برنامه">
-  <br>
-  <b>Choose a sender. Choose a recipient. Keep a clear local record.</b>
-  <br>
-  <b>فرستنده و گیرنده را انتخاب کن و سوابق ارسال را روی دستگاه ببین.</b>
+  <img src="docs/images/sms-forwarder-catalog.svg" width="100%" alt="SMS Forwarder product catalog infographic / اینفوگرافیک کاتالوگی SMS Forwarder">
+  <p><b>Route matching messages to the destinations you choose.</b></p>
+  <p dir="rtl"><b>پیام‌های منطبق را با قوانین دلخواه به مقصدهای انتخابی منتقل کن.</b></p>
 </div>
 
 [![Build APK](https://github.com/sdwqe34/SMS_Forwarder/actions/workflows/android.yml/badge.svg)](https://github.com/sdwqe34/SMS_Forwarder/actions/workflows/android.yml)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)](https://www.android.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**English:** SMS Forwarder is an open-source Android utility for choosing a sender and recipient, optionally forwarding future matching incoming messages, manually sending one selected inbox message after confirmation, and reviewing a local history of send attempts. The interface can be switched between English and Persian.
+**English:** SMS Forwarder is an open-source Android utility for creating independent forwarding rules. A rule can match a sender, optionally include or exclude message text, and route a matching message to one or more selected channels. The interface supports Persian and English.
 
-**فارسی:** «SMS Forwarder» ابزاری متن‌باز برای اندروید است. می‌توانی فرستنده و گیرنده را انتخاب کنی، فوروارد خودکار پیامک‌های جدیدِ منطبق را فعال کنی، یک پیام قدیمی را پس از تأیید بفرستی و سوابق تلاش‌های ارسال را ببینی. زبان رابط بین فارسی و انگلیسی قابل تغییر است.
+**فارسی:** «SMS Forwarder» ابزاری متن‌باز برای اندروید است که اجازه می‌دهد چند قانون مستقل انتقال پیام بسازی. هر قانون می‌تواند فرستنده را مشخص کند، شامل یا مستثنا بودن یک عبارت را بررسی کند و پیام منطبق را به یک یا چند روش انتخابی بفرستد. رابط برنامه فارسی و انگلیسی است.
 
-> **Important:** The history tracks Android send callbacks; it cannot prove that a carrier delivered a message to the final recipient. SMS forwarding can expose sensitive messages, including authentication codes. Use it only for messages you are authorized to share.
+> **Delivery clarity / شفافیت ارسال:** SMS can be sent automatically only when Android grants the required permissions. Email and consumer messenger channels create a notification and open a prepared, user-confirmed handoff; they do not silently send messages in the background. SMS send callbacks and local handoff records are not proof that the final recipient received a message.
 
-> **مهم:** تاریخچه، callbackهای ارسال اندروید را ثبت می‌کند و تحویل قطعی پیام توسط اپراتور به گیرنده را اثبات نمی‌کند. فوروارد پیامک ممکن است اطلاعات حساس، از جمله کدهای ورود، را افشا کند. فقط پیام‌هایی را فوروارد کن که اجازه‌ی انتقالشان را داری.
+> **شفافیت ارسال:** ارسال خودکار پیامک فقط در صورت اعطای مجوزهای لازم از سوی اندروید امکان‌پذیر است. برای ایمیل و پیام‌رسان‌ها، اعلان و متن آماده ایجاد می‌شود و کاربر باید مقصد را بررسی و ارسال را تأیید کند؛ این کانال‌ها در پس‌زمینه و بدون تأیید کاربر پیام نمی‌فرستند. وضعیت callback پیامک یا ثبت واگذاری محلی نیز اثبات نمی‌کند که گیرنده پیام را دریافت کرده است.
 
-## Screens & workflow | تصاویر و روند کار
+## Screens & workflow | نماها و روند کار
 
 <div align="center">
-  <img src="docs/images/forwarding-flow.svg" width="100%" alt="SMS Forwarder 1.3.0 setup, send status and local history flow / روند راه‌اندازی، وضعیت ارسال و سوابق محلی">
+  <img src="docs/images/forwarding-flow.svg" width="100%" alt="Editorial infographic showing sender matching, message filtering and channel selection / اینفوگرافیک روند تطبیق فرستنده، شرط متن و انتخاب کانال">
 </div>
 
-The artwork above is an updated interface/flow preview, not a screenshot of a running device. The History page in the app itself is populated from local send attempts and Android send callbacks; illustrative entries in the design preview are examples only.
+The illustrations are editorial product diagrams, not screenshots of a running device. Labels and example destinations in the diagrams are illustrative; the rules and destinations shown on the phone are configured by the user.
 
-تصاویر بالا پیش‌نمایش به‌روزشده‌ی رابط و روند کار هستند و اسکرین‌شات واقعی از گوشی نیستند. صفحه‌ی سوابق در برنامه از تلاش‌های واقعی ارسال و callbackهای اندروید پر می‌شود؛ اطلاعات نمونه در تصویر صرفاً برای نمایش ظاهر است.
+تصویرها، نمودارهای توضیحی و کاتالوگی هستند و اسکرین‌شات واقعی از گوشی نیستند. نام‌ها و مقصدهای نمونه صرفاً جنبه‌ی تصویری دارند؛ قانون‌ها و مقصدهای واقعی در برنامه را کاربر تعیین می‌کند.
 
-## What's new in 1.3.0 | امکانات نسخه ۱.۳.۰
+## What's new in 1.4.0 | امکانات نسخه ۱.۴.۰
 
 | English | فارسی |
 |---|---|
-| Switch the UI between Persian and English. | تغییر زبان رابط بین فارسی و انگلیسی |
-| Choose a source from the SMS inbox or Contacts. | انتخاب فرستنده از صندوق پیامک یا مخاطبین |
-| Choose a destination from Contacts, recent SMS senders, or type a number. | انتخاب گیرنده از مخاطبین، پیامک‌های اخیر یا ورود شماره |
-| Optionally auto-forward future messages from the configured sender. | فوروارد خودکار اختیاری پیامک‌های آینده از فرستنده‌ی تعیین‌شده |
-| Send one existing inbox SMS after explicit confirmation. | ارسال یک پیام قدیمی پس از تأیید صریح |
-| Local history: source, destination, body, date/time, mode, Android callback status and details. | تاریخچه‌ی محلی شامل مبدأ، مقصد، متن، تاریخ/زمان، نوع و وضعیت callback ارسال |
-| A dedicated permissions help page and direct link to Android app settings. | راهنمای مجوزها و پیوند مستقیم به تنظیمات برنامه |
-| About page with the repository, MIT license, version and project credit. | صفحه‌ی درباره شامل مخزن، مجوز MIT، نسخه و قدردانی پروژه |
+| **Multiple independent rules:** configure different senders and recipients without overwriting one global rule. | **چند قانون مستقل:** برای فرستنده‌ها و مقصدهای متفاوت، قانون جدا تعریف کن. |
+| **Optional content filters:** route only messages containing a phrase, and/or exclude messages containing another phrase. Matching is case-insensitive. | **فیلتر متن اختیاری:** فقط پیام‌های دارای یک عبارت را منتقل کن و/یا پیام‌های دارای عبارت دیگر را مستثنا کن؛ بررسی متن به بزرگی و کوچکی حروف حساس نیست. |
+| **Choose one or multiple channels per rule:** SMS, Email, Telegram, WhatsApp, Bale and Eitaa. | **انتخاب یک یا چند کانال برای هر قانون:** پیامک، ایمیل، تلگرام، واتساپ، بله و ایتا. |
+| Dedicated Rules page to add, edit, enable, pause and delete rules. | صفحه‌ی اختصاصی «قوانین» برای افزودن، ویرایش، فعال‌سازی، توقف و حذف قانون‌ها. |
+| Non-SMS forwarding handoffs with an Android notification, a prepared message flow and explicit user confirmation. | واگذاری انتقال غیرپیامکی با اعلان اندروید، پیش‌نمایش پیام و تأیید صریح کاربر. |
+| Local history for SMS send attempts and notification-based channel handoffs. | تاریخچه‌ی محلی برای تلاش‌های ارسال پیامک و واگذاری انتقال به کانال‌های دیگر. |
+| Existing single-rule settings are retained and represented in the Rules manager when a user starts using the new rule model. | تنظیمات قانون تک‌گانه‌ی قبلی حفظ می‌شود و با شروع استفاده از مدل جدید، در مدیریت قوانین نیز نمایش داده خواهد شد. |
+| Persian/English interface and clearer permission guidance. | رابط فارسی/انگلیسی و راهنمای شفاف‌تر مجوزها. |
 
-## Download | دریافت برنامه
+## Channels: what actually happens? | رفتار واقعی کانال‌ها
 
-- **APK release:** [SMS-Forwarder-1.3.0.apk](https://github.com/sdwqe34/SMS_Forwarder/releases/download/v1.3.0/SMS-Forwarder-1.3.0.apk)
-- **Release notes and checksum:** [GitHub Release v1.3.0](https://github.com/sdwqe34/SMS_Forwarder/releases/tag/v1.3.0)
-- **Builds and CI status:** [GitHub Actions](https://github.com/sdwqe34/SMS_Forwarder/actions/workflows/android.yml)
-- **Source code:** [sdwqe34/SMS_Forwarder](https://github.com/sdwqe34/SMS_Forwarder)
-- **GitHub Packages (Maven):** [Repository package page](https://github.com/users/sdwqe34/packages?repo_name=SMS_Forwarder)
+- **SMS:** the app calls Android's SMS service for matching messages when <code>RECEIVE_SMS</code> and <code>SEND_SMS</code> are granted. Carrier restrictions, device policies, SIM state and Android's restricted-permission rules can prevent this.
+- **Email:** tapping the notification opens an email composition screen addressed to the configured email address, with a subject and message text where supported by the selected email app.
+- **Telegram, WhatsApp, Bale and Eitaa:** tapping the notification attempts to open the selected app with the message text. The user must verify or choose the actual conversation/recipient and tap Send. Recipient handles are not guaranteed to be preselected, and the flow can fall back to Android's share chooser if the target app is unavailable or does not support the handoff intent.
 
-The release APK is built with Android's debug signing configuration for testing. It is not a Play Store production-signed package. Install only if you trust the source and understand the sensitive SMS permissions.
+- **پیامک:** برنامه برای پیام‌های منطبق از سرویس SMS اندروید استفاده می‌کند؛ مشروط بر اینکه مجوزهای <code>RECEIVE_SMS</code> و <code>SEND_SMS</code> اعطا شده باشند. محدودیت اپراتور، دستگاه، سیم‌کارت و قوانین مجوزهای اندروید ممکن است مانع ارسال شود.
+- **ایمیل:** با لمس اعلان، صفحه‌ی نوشتن ایمیل برای آدرس تنظیم‌شده باز می‌شود؛ موضوع و متن در صورت پشتیبانی برنامه‌ی ایمیل پر می‌شوند.
+- **تلگرام، واتساپ، بله و ایتا:** اعلان تلاش می‌کند برنامه‌ی انتخاب‌شده را با متن پیام باز کند. کاربر باید گفت‌وگو یا گیرنده‌ی واقعی را بررسی/انتخاب کند و دکمه‌ی ارسال را بزند. تضمینی نیست که شناسه‌ی مقصد از قبل انتخاب شود؛ اگر برنامه‌ی مقصد نصب نباشد یا از روش واگذاری پشتیبانی نکند، امکان استفاده از انتخاب‌گر اشتراک‌گذاری اندروید وجود دارد.
 
-فایل Release با امضای Debug برای آزمایش ساخته می‌شود و بسته‌ی امضاشده‌ی تولیدی برای Play Store نیست. فقط در صورتی نصب کن که به منبع فایل اعتماد داری و از حساسیت مجوزهای پیامک آگاه هستی.
+These consumer-app handoffs are **not official API integrations** and must not be described as guaranteed background delivery. Reliable unattended sending through third-party services would require a supported service API, authentication and appropriate server-side or provider configuration.
+
+این روش‌ها **اتصال رسمی به API پیام‌رسان‌ها نیستند** و نباید به‌عنوان ارسال تضمینی در پس‌زمینه معرفی شوند. برای ارسال خودکار قابل اتکا از طریق سرویس‌های ثالث، API پشتیبانی‌شده، احراز هویت و پیکربندی متناسب با ارائه‌دهنده لازم است.
 
 ## Setup | راه‌اندازی
 
-1. Install the APK and open SMS Forwarder.
-2. Review **Permissions & troubleshooting**. Grant SMS and Contacts access if Android offers the relevant controls.
-3. Choose the sender from an actual inbox message (recommended for alphanumeric sender IDs such as `MALIAT`) or a phone-number contact.
-4. Choose the destination from Contacts, recent SMS senders, or enter a number with country code.
-5. Keep auto-forwarding off until the sender/destination are correct; enable the switch and save the rule.
-6. For one-time sending, choose an inbox message, press **Send this message**, inspect the destination, and confirm.
-7. Open **History** to review the text, source, destination, timestamp, send mode and current Android result. The log can be cleared from that page.
+1. Install and open SMS Forwarder.
+2. Open **Rules / قوانین**, then select **Add a rule / افزودن قانون جدید**.
+3. Enter the sender number or sender ID exactly as it appears in your inbox. Phone-number comparison also normalizes common formatting differences.
+4. Optionally add a phrase that the message must contain and/or a phrase it must not contain.
+5. Select one or more channels and provide a destination for each selected channel. For messenger apps, the configured destination is a helpful label/handle; confirm the actual recipient inside the messenger before sending.
+6. Save the rule. Use the switch on the rule card to pause or enable it; use Edit or Delete to maintain your rules.
+7. Grant the relevant permissions. On Android 13 and later, allow notifications so non-SMS handoffs can appear.
+8. Open **History / سوابق** to review send attempts, message content, destinations and Android callback/handoff status.
 
-۱. فایل APK را نصب و برنامه را باز کن.
-۲. بخش «مجوزها و راهنمای رفع مشکل» را بخوان؛ اگر اندروید گزینه‌های مربوط را نمایش داد، مجوزهای پیامک و مخاطبین را فعال کن.
-۳. فرستنده را از یک پیام واقعی صندوق انتخاب کن (برای سرشماره‌ی متنی مثل `MALIAT` این روش بهتر است) یا مخاطبی با شماره تلفن انتخاب کن.
-۴. گیرنده را از مخاطبین، پیامک‌های اخیر یا با کد کشور وارد کن.
-۵. تا وقتی فرستنده و گیرنده را بررسی نکرده‌ای، فوروارد خودکار را خاموش نگه دار؛ سپس گزینه را فعال و قانون را ذخیره کن.
-۶. برای ارسال یک‌باره، پیام را انتخاب کن، «ارسال همین پیام» را بزن، شماره مقصد را بررسی و ارسال را تأیید کن.
-۷. در «سوابق»، متن، مبدأ، مقصد، زمان، نوع ارسال و آخرین وضعیت اندروید را ببین. از همین صفحه می‌توانی تاریخچه را پاک کنی.
+۱. برنامه را نصب و باز کن.
+۲. وارد تب **قوانین** شو و گزینه‌ی **افزودن قانون جدید** را بزن.
+۳. شماره یا شناسه‌ی فرستنده را مطابق صندوق پیامک وارد کن. مقایسه‌ی شماره تلفن اختلاف‌های رایج در قالب شماره را نیز در نظر می‌گیرد.
+۴. در صورت نیاز عبارتی را وارد کن که پیام باید شامل آن باشد و/یا عبارتی را مشخص کن که نباید در پیام وجود داشته باشد.
+۵. یک یا چند روش ارسال را انتخاب و برای هر روش یک مقصد وارد کن. برای پیام‌رسان‌ها، مقصد ثبت‌شده صرفاً نام/شناسه‌ی راهنماست؛ پیش از ارسال، گیرنده‌ی واقعی را داخل پیام‌رسان بررسی کن.
+۶. قانون را ذخیره کن. با کلید روی کارت قانون می‌توان آن را متوقف یا فعال کرد؛ گزینه‌های ویرایش و حذف نیز در دسترس‌اند.
+۷. مجوزهای لازم را فعال کن. در اندروید ۱۳ و بالاتر، برای نمایش واگذاری‌های غیرپیامکی مجوز اعلان‌ها را نیز بده.
+۸. در تب **سوابق**، تلاش‌های ارسال، متن پیام، مقصدها و وضعیت callback پیامک یا واگذاری به کانال دیگر را بررسی کن.
 
-## Samsung Galaxy / Android permission troubleshooting | رفع مشکل مجوز پیامک
+## Permissions & Android limitations | مجوزها و محدودیت‌های اندروید
 
-### Why the SMS permission button may seem not to work
+The app uses SMS and Contacts permissions for its core inbox, sender matching and SMS-sending features. Android may treat <code>READ_SMS</code>, <code>RECEIVE_SMS</code> and <code>SEND_SMS</code> as restricted permissions, depending on the platform version and installation source. An ordinary app cannot grant or allowlist these permissions for itself. Turning off Samsung Auto Blocker or enabling **Allow restricted settings** is not a guaranteed fix.
 
-The permission button first asks Android for the required runtime permissions. On some installations Android does not present a grant option for SMS permissions, or the permissions remain unavailable even after visiting Settings. This is not necessarily caused by Samsung Auto Blocker.
+این برنامه برای قابلیت‌های اصلیِ صندوق پیامک، تطبیق فرستنده و ارسال SMS از مجوزهای پیامک و مخاطبین استفاده می‌کند. بسته به نسخه‌ی اندروید و منبع نصب، مجوزهای <code>READ_SMS</code>، <code>RECEIVE_SMS</code> و <code>SEND_SMS</code> ممکن است محدودشده باشند. برنامه‌ی عادی نمی‌تواند خودش این مجوزها را به خودش اعطا یا allowlist کند. خاموش‌کردن Auto Blocker سامسونگ یا فعال‌کردن **Allow restricted settings** راه‌حل تضمین‌شده‌ای نیست.
 
-Android treats `READ_SMS`, `RECEIVE_SMS` and `SEND_SMS` as hard-restricted permissions in relevant platform configurations. Granting them can depend on the installer or distribution channel explicitly allowlisting them. An ordinary app cannot add itself to that allowlist.
+### If SMS permissions are unavailable
 
-### Steps to try on a Galaxy S24 FE
+1. Open **Settings → Apps → SMS Forwarder → Permissions** and inspect the SMS permissions shown by Android.
+2. Allow Contacts and Notifications separately if needed.
+3. If SMS permissions do not appear or cannot be granted, repeated prompts or reinstalling the same APK may not help. Use an installation/distribution channel that is permitted to grant the relevant restricted permissions.
+4. Do not root the phone, disable device security or install unknown APKs to bypass the restriction.
 
-1. Open **Settings → Apps → SMS Forwarder → Permissions**. Inspect whether the SMS permissions appear at all; if shown, grant the available ones. Under **Contacts**, grant contact access separately.
-2. Return to **Settings → Apps → SMS Forwarder → ⋮**. If **Allow restricted settings** appears, enable it only if you trust the app, then revisit the Permissions page. This setting is not a guaranteed solution for hard-restricted SMS permissions.
-3. If the SMS permissions are still missing or unavailable, reinstalling the same APK or pressing the app's button repeatedly may not fix it. Use a compliant installation/distribution route that can grant/allowlist these restricted permissions. Do not disable device security, root the phone, or install an unknown APK to get around the restriction.
-4. After any permission change, return to the app and revisit the dashboard. The permission status is refreshed when the app resumes.
-5. If Contacts access is denied, press either Contacts button again and use its prompt. If Android no longer offers the dialog, use **Permissions → Contacts** in Settings, then retry the picker.
+### اگر مجوز پیامک در دسترس نیست
 
-### Android permission links
+۱. مسیر **تنظیمات ← برنامه‌ها ← SMS Forwarder ← مجوزها** را باز و مجوزهای پیامک نمایش‌داده‌شده را بررسی کن.
+۲. در صورت نیاز، مجوزهای مخاطبین و اعلان‌ها را جداگانه فعال کن.
+۳. اگر مجوز SMS نمایش داده نمی‌شود یا قابل اعطا نیست، درخواست مکرر یا نصب دوباره‌ی همان APK ممکن است مشکلی را حل نکند. از مسیر نصب/توزیعی استفاده کن که اجازه‌ی اعطای مجوزهای محدودشده را دارد.
+۴. برای دورزدن محدودیت، گوشی را root نکن، امنیت دستگاه را خاموش نکن و APK ناشناس نصب نکن.
 
-- [Android: Change app permissions](https://support.google.com/android/answer/9431959?hl=en)
-- [Android: Restricted settings](https://support.google.com/android/answer/12623953?hl=en)
-- [Android compatibility definition — permissions](https://source.android.com/docs/compatibility/14/android-14-cdd)
-- [Android permission model and allowlisting](https://source.android.com/docs/core/permissions/runtime_perms)
+Helpful Android documentation:
+- [Change app permissions](https://support.google.com/android/answer/9431959?hl=en)
+- [Restricted settings](https://support.google.com/android/answer/12623953?hl=en)
+- [Android runtime permissions](https://source.android.com/docs/core/permissions/runtime_perms)
 
-### Persian instructions
+## History & privacy | تاریخچه و حریم خصوصی
 
-دکمه‌ی مجوزها ابتدا از اندروید درخواست می‌کند مجوزهای زمان اجرا را نمایش دهد. در بعضی نصب‌ها، اندروید گزینه‌ی اعطای مجوز پیامک را نمایش نمی‌دهد یا حتی پس از ورود به تنظیمات هم امکان فعال‌سازی آن وجود ندارد؛ این مسئله لزوماً به Auto Blocker سامسونگ مربوط نیست.
+- Rules and history are stored locally in app-private storage; this code does not upload them to a service.
+- Up to 500 history entries are retained; older entries are dropped when the limit is exceeded.
+- History can contain message bodies, sender IDs, phone numbers, email addresses and recipient labels. Treat it as sensitive information.
+- SMS status reflects Android send callbacks, not a carrier delivery receipt.
+- Non-SMS handoffs stay in a waiting/queued state until the user acts in the target app; this app cannot know whether the user eventually pressed Send or whether a third-party service delivered the message.
+- The app does not declare the Internet permission. Carrier SMS charges may apply.
 
-در برخی پیکربندی‌های اندروید، مجوزهای `READ_SMS`، `RECEIVE_SMS` و `SEND_SMS` از نوع «محدودشده‌ی سخت» هستند. اعطای آن‌ها ممکن است به این بستگی داشته باشد که نصب‌کننده یا کانال توزیع، مجوزها را صریحاً در فهرست مجاز قرار داده باشد. برنامه نمی‌تواند خودش این محدودیت را برطرف کند.
+- قوانین و سوابق به‌صورت محلی در فضای خصوصی برنامه ذخیره می‌شوند؛ این کد آن‌ها را به سرویس آنلاین ارسال نمی‌کند.
+- حداکثر ۵۰۰ سابقه نگهداری می‌شود و در صورت عبور از این سقف، رکوردهای قدیمی حذف می‌شوند.
+- تاریخچه می‌تواند متن پیام، شناسه‌ی فرستنده، شماره تلفن، آدرس ایمیل و نام مقصد را شامل شود؛ بنابراین اطلاعات حساس محسوب می‌شود.
+- وضعیت SMS بر اساس callback اندروید است، نه رسید تحویل اپراتور.
+- واگذاری‌های غیرپیامکی تا زمان اقدام کاربر در حالت انتظار می‌مانند؛ برنامه نمی‌تواند بفهمد کاربر در نهایت دکمه‌ی ارسال را زده یا سرویس ثالث پیام را تحویل داده است.
+- برنامه مجوز اینترنت را در Manifest اعلام نمی‌کند. هزینه‌ی پیامک اپراتور ممکن است اعمال شود.
 
-**مراحل پیشنهادی برای Galaxy S24 FE:**
+## Download | دریافت برنامه
 
-۱. به **تنظیمات ← برنامه‌ها ← SMS Forwarder ← مجوزها** برو. بررسی کن مجوزهای SMS اصلاً نمایش داده می‌شوند یا نه؛ اگر قابل فعال‌سازی‌اند آن‌ها را فعال کن. مجوز «مخاطبین» را نیز جداگانه بررسی کن.
-۲. به **تنظیمات ← برنامه‌ها ← SMS Forwarder ← سه‌نقطه** برو. اگر **Allow restricted settings** نمایش داده شد، فقط در صورت اعتماد به برنامه آن را فعال کن و دوباره صفحه‌ی مجوزها را بررسی کن. این گزینه برای مجوزهای پیامکِ محدودشده‌ی سخت راه‌حل تضمین‌شده نیست.
-۳. اگر مجوزهای پیامک همچنان نمایش داده نمی‌شوند یا غیرفعال‌اند، نصب مجدد همان APK یا فشردن مکرر دکمه احتمالاً مشکل را حل نمی‌کند. از روش نصب/توزیع مجازی استفاده کن که بتواند این مجوزها را allowlist کند. برای دورزدن مشکل، امنیت دستگاه را خاموش نکن، گوشی را root نکن و APK ناشناس نصب نکن.
-۴. پس از تغییر مجوز، به برنامه برگرد؛ وضعیت دسترسی هنگام بازگشت به برنامه به‌روزرسانی می‌شود.
-۵. اگر مجوز مخاطبین رد شده است، یکی از دکمه‌های مخاطبین را دوباره بزن. اگر اندروید دیگر پنجره درخواست را نشان نداد، از تنظیمات برنامه ← مجوزها ← مخاطبین آن را فعال کن و دوباره انتخاب مخاطب را امتحان کن.
+- **Latest published binary at the time of this source update:** [SMS-Forwarder-1.3.0.apk](https://github.com/sdwqe34/SMS_Forwarder/releases/download/v1.3.0/SMS-Forwarder-1.3.0.apk)
+- **Release page and checksum:** [GitHub Release v1.3.0](https://github.com/sdwqe34/SMS_Forwarder/releases/tag/v1.3.0)
+- **Builds and CI:** [GitHub Actions](https://github.com/sdwqe34/SMS_Forwarder/actions/workflows/android.yml)
+- **Source code:** [sdwqe34/SMS_Forwarder](https://github.com/sdwqe34/SMS_Forwarder)
 
-## Message history & privacy | تاریخچه و حریم خصوصی
+The source configuration is being prepared as version **1.4.0**. The existing v1.3.0 APK does not include the new rules and channel handoffs. Install only builds you trust and understand the permissions they request.
 
-- History is saved locally on the device using app-private storage. It is not uploaded to a server.
-- Up to 500 records are retained; older entries are dropped when the limit is exceeded.
-- Each record stores the source, recipient, message body, timestamp, manual/automatic mode, Android result status and a diagnostic detail. Message bodies may contain sensitive data.
-- The History screen contains a **Clear history** action.
-- “Sent to network” means Android reported success for all SMS parts. This app does not receive a carrier delivery receipt, so this status is not proof the recipient received the message.
-- The app does not request Internet permission. Carrier charges may apply.
-
-- سوابق ارسال با ذخیره‌سازی خصوصی برنامه روی همان دستگاه نگهداری می‌شوند و به سرور ارسال نمی‌شوند.
-- حداکثر ۵۰۰ رکورد نگهداری می‌شود؛ پس از رسیدن به سقف، رکوردهای قدیمی حذف می‌شوند.
-- هر رکورد مبدأ، گیرنده، متن پیام، زمان، نوع ارسال دستی/خودکار، وضعیت نتیجه‌ی اندروید و توضیحات خطا را ذخیره می‌کند. متن پیام ممکن است حاوی اطلاعات حساس باشد.
-- در صفحه‌ی سوابق دکمه‌ی «پاک‌کردن سوابق» وجود دارد.
-- «ارسال‌شده به شبکه» یعنی اندروید برای تمام بخش‌های پیام نتیجه‌ی موفق گزارش کرده است؛ برنامه رسید تحویل اپراتور را دریافت نمی‌کند و این وضعیت تحویل به گیرنده را ثابت نمی‌کند.
-- برنامه مجوز اینترنت نمی‌خواهد؛ هزینه‌ی پیامک اپراتور ممکن است اعمال شود.
+در زمان این به‌روزرسانی، فایل عمومی منتشرشده همچنان نسخه‌ی **۱.۳.۰** است و قابلیت‌های جدید نسخه‌ی منبع ۱.۴.۰ را ندارد. فقط نسخه‌هایی را نصب کن که به منبع آن‌ها اعتماد داری و مجوزهای درخواستی‌شان را می‌شناسی.
 
 ## Build from source | ساخت از سورس
 
-Requirements: JDK 17 and Gradle 8.7. Open `SmsForwarder/` in Android Studio or run:
+Requirements: JDK 17 and Gradle 8.7. Open <code>SmsForwarder/</code> in Android Studio or run:
 
-```bash
-cd SmsForwarder
-gradle --no-daemon clean :app:assembleDebug
-```
+    cd SmsForwarder
+    gradle --no-daemon clean :app:assembleDebug
 
-The APK is generated at `SmsForwarder/app/build/outputs/apk/debug/app-debug.apk`.
+The debug APK is generated at <code>SmsForwarder/app/build/outputs/apk/debug/app-debug.apk</code>. This is a debug-signed testing build, not a production-signed Play Store package.
 
-برای ساخت، JDK 17 و Gradle 8.7 لازم است. پوشه‌ی `SmsForwarder/` را در Android Studio باز کن یا دستورهای بالا را اجرا کن. فایل خروجی در `SmsForwarder/app/build/outputs/apk/debug/app-debug.apk` قرار می‌گیرد.
+برای ساخت، JDK 17 و Gradle 8.7 لازم است. پوشه‌ی <code>SmsForwarder/</code> را در Android Studio باز کن یا دستورهای بالا را اجرا کن. فایل APK در مسیر <code>SmsForwarder/app/build/outputs/apk/debug/app-debug.apk</code> ساخته می‌شود. این فایل با امضای Debug برای آزمایش است و بسته‌ی امضاشده‌ی تولیدی برای Play Store نیست.
 
 ## About | درباره
 
 - **Repository:** [sdwqe34/SMS_Forwarder](https://github.com/sdwqe34/SMS_Forwarder)
 - **License:** [MIT](LICENSE)
-- **Version:** 1.3.0
+- **Source version:** 1.4.0
 - **Credit:** با تشکر از M.H.K
 
 ## License | مجوز

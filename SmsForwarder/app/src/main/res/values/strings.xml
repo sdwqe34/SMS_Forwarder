@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SMS Forwarder</string>
-    <string name="app_description">Select a sender from your SMS inbox or contacts, then forward matching incoming messages to your chosen recipient. Includes local send history and Persian/English UI.</string>
+    <string name="app_description">Create conditional forwarding rules for incoming SMS and select one or more destinations. SMS uses Android permissions; email and messenger handoffs require user confirmation. Includes local history and Persian/English UI.</string>
 </resources>

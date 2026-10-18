@@ -21,6 +21,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -45,6 +46,16 @@ class MainActivity : Activity() {
     private var isPersian = false
     private var pendingContactSource = false
     private var pendingSmsSource = true
+
+    private var showRuleEditor = false
+    private var editingRuleId: String? = null
+    private var editingRuleDraft: ForwardingRule? = null
+    private var ruleSourceInput: EditText? = null
+    private var ruleContainsInput: EditText? = null
+    private var ruleExcludesInput: EditText? = null
+    private var ruleEnabledSwitch: Switch? = null
+    private val ruleChannelChecks = linkedMapOf<String, CheckBox>()
+    private val ruleDestinationInputs = linkedMapOf<String, EditText>()
 
     private data class InboxItem(val address: String, val body: String, val date: Long)
     private data class ContactItem(val name: String, val number: String)
@@ -75,6 +86,13 @@ class MainActivity : Activity() {
         draftTarget = prefs.getString("target", "").orEmpty()
         draftEnabled = prefs.getBoolean("enabled", false)
         render()
+        intent?.let { handleDeliveryIntent(it) }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleDeliveryIntent(intent)
     }
 
     override fun onResume() {
@@ -172,6 +190,7 @@ class MainActivity : Activity() {
         }
         when (activeTab) {
             TAB_FORWARD -> buildForwardPage(page)
+            TAB_RULES -> buildRulesPage(page)
             TAB_HISTORY -> buildHistoryPage(page)
             else -> buildAboutPage(page)
         }
@@ -336,8 +355,8 @@ class MainActivity : Activity() {
         }
         ruleCard.addView(autoSwitch, matchWidth())
         label(ruleCard, t(
-            "Only the saved sender is matched. Other senders are ignored.",
-            "فقط فرستنده‌ی ذخیره‌شده بررسی می‌شود؛ سایر فرستنده‌ها نادیده گرفته می‌شوند."
+            "This screen keeps one legacy SMS rule. Use Rules for independent multi-sender and multi-channel automation.",
+            "این صفحه یک قانون قدیمی پیامکی را مدیریت می‌کند؛ برای قوانین مستقل و چندروش ارسال، از تب «قوانین» استفاده کن."
         ), 11f, muted)
         addButton(ruleCard, t("Save forwarding rule", "ذخیره قانون فوروارد")) { saveSettings() }
 
@@ -359,6 +378,260 @@ class MainActivity : Activity() {
             "بهینه‌سازی باتری ممکن است عملکرد پس‌زمینه را در برخی گوشی‌ها به تأخیر بیندازد."
         ), 12f, muted)
         addButton(batteryCard, t("Battery settings", "تنظیمات باتری"), false) { requestIgnoreBattery() }
+    }
+
+
+    private fun makeRuleEditText(hintText: String, value: String = "", phone: Boolean = false): EditText =
+        EditText(this).apply {
+            hint = hintText
+            inputType = if (phone) InputType.TYPE_CLASS_PHONE else InputType.TYPE_CLASS_TEXT
+            setSingleLine(true)
+            setText(value)
+            textSize = 14f
+            setTextColor(navy)
+            setHintTextColor(muted)
+            background = rounded(bg, 10, border)
+            setPadding(dp(12), dp(7), dp(12), dp(7))
+        }
+
+    private fun buildRulesPage(parent: LinearLayout) {
+        label(parent, t("ROUTING STUDIO", "مدیریت قوانین انتقال"), 10f, teal, true)
+        label(parent, t("Rules & destinations", "قوانین و مقصدها"), 25f, navy, true)
+        label(parent, t(
+            "Create independent rules for different senders, filters and one or more delivery channels.",
+            "برای فرستنده‌های مختلف، شرط متن و یک یا چند روش انتقال، قوانین مستقل بساز."
+        ), 13f, muted)
+
+        val note = card(parent, 14)
+        label(note, t("How delivery works", "روش کار ارسال"), 14f, navy, true)
+        label(note, t(
+            "SMS rules send directly when Android grants SMS permission. Email and messenger rules create a notification; tapping it opens a prepared message so you can review the recipient and send it yourself.",
+            "قوانین SMS در صورت اعطای مجوز اندروید، پیامک را مستقیم می‌فرستند. برای ایمیل و پیام‌رسان‌ها اعلان ساخته می‌شود؛ با لمس آن، متن آماده باز می‌شود تا مقصد را بررسی و خودت ارسال کنی."
+        ), 12f, muted)
+        addButton(note, t("Review permissions", "بررسی مجوزها"), false) {
+            requestRequiredPermissions()
+        }
+
+        if (showRuleEditor) buildRuleEditor(parent)
+
+        val rules = ForwardingRuleStore.all(this)
+        val listCard = card(parent)
+        label(listCard, t("Saved rules", "قوانین ذخیره‌شده"), 17f, navy, true)
+        label(listCard, t("Rule count: ", "تعداد قانون: ") + rules.size.toString(), 11f, muted)
+        addButton(listCard, t("+ Add a rule", "+ افزودن قانون جدید")) {
+            editingRuleId = null
+            editingRuleDraft = null
+            showRuleEditor = true
+            render()
+        }
+
+        if (rules.isEmpty()) {
+            label(listCard, t(
+                "No multi-channel rules yet. Add a rule to route messages from a sender.",
+                "هنوز قانونی ثبت نشده است؛ برای انتقال پیام‌های یک فرستنده، قانون جدید اضافه کن."
+            ), 12f, muted)
+        } else {
+            rules.forEach { rule ->
+                val item = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(dp(12), dp(12), dp(12), dp(12))
+                    background = rounded(bg, 12, border)
+                }
+                val itemParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = dp(10) }
+                listCard.addView(item, itemParams)
+                label(item, rule.source, 15f, navy, true)
+                val channelsText = rule.channels.sorted().joinToString(" · ") { channelLabel(it) }
+                label(item, channelsText, 12f, teal, true)
+                val conditions = buildList {
+                    if (rule.containsText.isNotBlank()) add(t("Contains: ", "شامل: ") + rule.containsText)
+                    if (rule.excludesText.isNotBlank()) add(t("Excludes: ", "به‌جز: ") + rule.excludesText)
+                }.joinToString("  |  ")
+                if (conditions.isNotBlank()) label(item, conditions, 11f, muted)
+                val activeSwitch = Switch(this).apply {
+                    text = t("Rule enabled", "فعال بودن قانون")
+                    textSize = 12f
+                    setTextColor(navy)
+                    isChecked = rule.enabled
+                    setOnCheckedChangeListener { _, checked ->
+                        ForwardingRuleStore.save(this@MainActivity, rule.copy(enabled = checked))
+                        toast(if (checked) t("Rule enabled.", "قانون فعال شد.") else t("Rule paused.", "قانون متوقف شد."))
+                    }
+                }
+                item.addView(activeSwitch, matchWidth())
+                buttonRow(
+                    item,
+                    t("Edit", "ویرایش"),
+                    t("Delete", "حذف"),
+                    {
+                        editingRuleId = rule.id
+                        editingRuleDraft = rule
+                        showRuleEditor = true
+                        render()
+                    },
+                    {
+                        AlertDialog.Builder(this)
+                            .setTitle(t("Delete this rule?", "این قانون حذف شود؟"))
+                            .setMessage(rule.source)
+                            .setPositiveButton(t("Delete", "حذف")) { _, _ ->
+                                ForwardingRuleStore.delete(this, rule.id)
+                                if (editingRuleId == rule.id) {
+                                    editingRuleId = null
+                                    editingRuleDraft = null
+                                    showRuleEditor = false
+                                }
+                                render()
+                            }
+                            .setNegativeButton(t("Cancel", "انصراف"), null)
+                            .show()
+                    }
+                )
+            }
+        }
+
+        label(parent, t(
+            "Tip: Use a short, unique phrase as a content condition when only certain messages from the same sender should be routed.",
+            "نکته: اگر فقط بعضی پیام‌های یک فرستنده باید منتقل شوند، یک عبارت کوتاه و مشخص را به‌عنوان شرط متن وارد کن."
+        ), 11f, muted)
+    }
+
+    private fun buildRuleEditor(parent: LinearLayout) {
+        val existing = editingRuleDraft
+        val editor = card(parent)
+        label(editor, if (existing == null) t("New forwarding rule", "قانون انتقال جدید")
+            else t("Edit forwarding rule", "ویرایش قانون انتقال"), 17f, navy, true)
+        label(editor, t(
+            "A rule runs only when the sender and optional text conditions match.",
+            "قانون فقط زمانی اجرا می‌شود که فرستنده و شرط‌های اختیاری متن منطبق باشند."
+        ), 12f, muted)
+
+        label(editor, t("Sender address or ID", "شماره یا شناسه فرستنده"), 12f, navy, true)
+        ruleSourceInput = makeRuleEditText(t("e.g. +98912… or MALIAT", "مثلاً +98912… یا MALIAT"), existing?.source.orEmpty())
+        editor.addView(ruleSourceInput, matchWidth())
+
+        label(editor, t("Message must contain (optional)", "پیام باید شامل این عبارت باشد (اختیاری)"), 12f, navy, true)
+        ruleContainsInput = makeRuleEditText(t("Text to match", "عبارت مورد جست‌وجو"), existing?.containsText.orEmpty())
+        editor.addView(ruleContainsInput, matchWidth())
+
+        label(editor, t("Message must NOT contain (optional)", "پیام نباید شامل این عبارت باشد (اختیاری)"), 12f, navy, true)
+        ruleExcludesInput = makeRuleEditText(t("Text to exclude", "عبارت مستثنا"), existing?.excludesText.orEmpty())
+        editor.addView(ruleExcludesInput, matchWidth())
+
+        label(editor, t("Delivery channels and destinations", "روش‌های ارسال و مقصد هرکدام"), 14f, navy, true)
+        label(editor, t(
+            "Select one or more channels. For messenger apps, enter a helpful recipient label/handle; you will confirm the actual recipient inside that app.",
+            "یک یا چند روش را انتخاب کن. برای پیام‌رسان‌ها، نام یا شناسه مقصد را وارد کن؛ انتخاب نهایی گیرنده داخل همان پیام‌رسان انجام می‌شود."
+        ), 11f, muted)
+
+        ruleChannelChecks.clear()
+        ruleDestinationInputs.clear()
+        val channels = listOf(
+            ForwardingRuleStore.SMS to t("SMS", "پیامک"),
+            ForwardingRuleStore.EMAIL to t("Email", "ایمیل"),
+            ForwardingRuleStore.TELEGRAM to "Telegram",
+            ForwardingRuleStore.WHATSAPP to "WhatsApp",
+            ForwardingRuleStore.BALE to "Bale",
+            ForwardingRuleStore.EITAA to "Eitaa"
+        )
+        channels.forEach { (key, displayName) ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+            }
+            val check = CheckBox(this).apply {
+                text = displayName
+                textSize = 13f
+                setTextColor(navy)
+                isChecked = existing?.channels?.contains(key) ?: (key == ForwardingRuleStore.SMS)
+            }
+            ruleChannelChecks[key] = check
+            row.addView(check, LinearLayout.LayoutParams(dp(112), ViewGroup.LayoutParams.WRAP_CONTENT))
+            val dest = makeRuleEditText(channelHint(key), existing?.destinations?.get(key).orEmpty(),
+                phone = key == ForwardingRuleStore.SMS)
+            ruleDestinationInputs[key] = dest
+            row.addView(dest, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+            val params = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = dp(4) }
+            editor.addView(row, params)
+        }
+
+        ruleEnabledSwitch = Switch(this).apply {
+            text = t("Enable this rule", "فعال‌سازی قانون")
+            textSize = 13f
+            setTextColor(navy)
+            isChecked = existing?.enabled ?: true
+        }
+        editor.addView(ruleEnabledSwitch, matchWidth())
+
+        addButton(editor, t("Save rule", "ذخیره قانون")) { saveManagedRule() }
+        addButton(editor, t("Cancel", "انصراف"), false) {
+            showRuleEditor = false
+            editingRuleId = null
+            editingRuleDraft = null
+            render()
+        }
+    }
+
+    private fun channelHint(channel: String): String = when (channel) {
+        ForwardingRuleStore.SMS -> t("Phone number", "شماره تلفن")
+        ForwardingRuleStore.EMAIL -> t("name@example.com", "name@example.com")
+        ForwardingRuleStore.TELEGRAM -> t("Username or recipient label", "نام کاربری یا نام گیرنده")
+        ForwardingRuleStore.WHATSAPP -> t("Phone number / recipient", "شماره یا نام گیرنده")
+        ForwardingRuleStore.BALE -> t("Recipient ID / label", "شناسه یا نام گیرنده")
+        ForwardingRuleStore.EITAA -> t("Recipient ID / label", "شناسه یا نام گیرنده")
+        else -> ""
+    }
+
+    private fun channelLabel(channel: String): String = when (channel) {
+        ForwardingRuleStore.SMS -> t("SMS", "پیامک")
+        ForwardingRuleStore.EMAIL -> t("Email", "ایمیل")
+        ForwardingRuleStore.TELEGRAM -> "Telegram"
+        ForwardingRuleStore.WHATSAPP -> "WhatsApp"
+        ForwardingRuleStore.BALE -> "Bale"
+        ForwardingRuleStore.EITAA -> "Eitaa"
+        else -> channel
+    }
+
+    private fun saveManagedRule() {
+        val source = ruleSourceInput?.text?.toString()?.trim().orEmpty()
+        val contains = ruleContainsInput?.text?.toString()?.trim().orEmpty()
+        val excludes = ruleExcludesInput?.text?.toString()?.trim().orEmpty()
+        val channels = ruleChannelChecks.filterValues { it.isChecked }.keys.toSet()
+        val destinations = ruleDestinationInputs.mapValues { it.value.text.toString().trim() }
+
+        if (source.isBlank()) {
+            toast(t("Enter a sender address or ID.", "شماره یا شناسه فرستنده را وارد کن."))
+            return
+        }
+        if (channels.isEmpty()) {
+            toast(t("Select at least one delivery channel.", "حداقل یک روش ارسال انتخاب کن."))
+            return
+        }
+        val missing = channels.filter { destinations[it].isNullOrBlank() }
+        if (missing.isNotEmpty()) {
+            toast(t(
+                "Enter a destination for: " + missing.joinToString { channelLabel(it) },
+                "برای این روش‌ها مقصد وارد کن: " + missing.joinToString { channelLabel(it) }
+            ))
+            return
+        }
+        val rule = ForwardingRule(
+            id = editingRuleId ?: java.util.UUID.randomUUID().toString(),
+            source = source,
+            containsText = contains,
+            excludesText = excludes,
+            channels = channels,
+            destinations = destinations,
+            enabled = ruleEnabledSwitch?.isChecked ?: true
+        )
+        ForwardingRuleStore.save(this, rule)
+        showRuleEditor = false
+        editingRuleId = null
+        editingRuleDraft = null
+        toast(t("Rule saved.", "قانون ذخیره شد."))
+        render()
     }
 
     private fun buildHistoryPage(parent: LinearLayout) {
@@ -386,16 +659,20 @@ class MainActivity : Activity() {
             records.forEach { item ->
                 val itemCard = card(parent, 14)
                 val status = item.optString("status", "queued")
+                val mode = item.optString("mode", "manual")
                 val statusColor = when (status) {
                     "sent" -> teal
                     "failed" -> red
                     else -> amber
                 }
-                label(itemCard, statusLabel(status), 12f, statusColor, true)
+                val statusText = if (mode.startsWith("handoff_") && status == "queued")
+                    t("Waiting for user confirmation", "در انتظار تأیید و ارسال توسط کاربر")
+                else statusLabel(status)
+                label(itemCard, statusText, 12f, statusColor, true)
                 label(itemCard, t("From", "مبدأ") + ": " + item.optString("source", "—"), 12f, navy, true)
                 label(itemCard, t("To", "مقصد") + ": " + item.optString("target", "—"), 12f, navy, true)
                 label(itemCard, t("Date & time", "تاریخ و زمان") + ": " + formatTimestamp(item.optLong("timestamp")), 11f, muted)
-                label(itemCard, t("Type", "نوع") + ": " + modeLabel(item.optString("mode", "manual")), 11f, muted)
+                label(itemCard, t("Type", "نوع") + ": " + modeLabel(mode), 11f, muted)
                 val bodyBox = LinearLayout(this).apply {
                     orientation = LinearLayout.VERTICAL
                     setPadding(dp(10), dp(8), dp(10), dp(8))
@@ -464,8 +741,8 @@ class MainActivity : Activity() {
         }
         val version = try {
             @Suppress("DEPRECATION")
-            packageManager.getPackageInfo(packageName, 0).versionName ?: "1.3.0"
-        } catch (_: Exception) { "1.3.0" }
+            packageManager.getPackageInfo(packageName, 0).versionName ?: "1.4.0"
+        } catch (_: Exception) { "1.4.0" }
         label(about, t("Version ", "نسخه ") + version, 12f, muted)
         label(about, t(
             "Preferences and send history are stored locally. No external server or Internet permission is required.",
@@ -481,7 +758,7 @@ class MainActivity : Activity() {
             setBackgroundColor(white)
             gravity = Gravity.CENTER
         }
-        val labels = arrayOf(t("Forward", "فوروارد"), t("History", "سوابق"), t("About", "درباره"))
+        val labels = arrayOf(t("Forward", "فوروارد"), t("Rules", "قوانین"), t("History", "سوابق"), t("About", "درباره"))
         labels.forEachIndexed { index, text ->
             val button = Button(this).apply {
                 this.text = text
@@ -544,6 +821,7 @@ class MainActivity : Activity() {
                     getSharedPreferences("cfg", Context.MODE_PRIVATE).edit()
                         .putString("source", draftSource).putString("target", draftTarget)
                         .putBoolean("enabled", false).apply()
+                    syncLegacyRuleToManagedStore()
                     render()
                 }.show()
             return
@@ -553,8 +831,28 @@ class MainActivity : Activity() {
             .putString("target", draftTarget)
             .putBoolean("enabled", draftEnabled)
             .apply()
+        syncLegacyRuleToManagedStore()
         toast(t("Forwarding rule saved.", "قانون فوروارد ذخیره شد."))
         render()
+    }
+
+    private fun syncLegacyRuleToManagedStore() {
+        val source = draftSource.trim()
+        val target = draftTarget.trim()
+        if (source.isBlank() || target.isBlank()) {
+            ForwardingRuleStore.delete(this, "legacy-single-rule")
+            return
+        }
+        ForwardingRuleStore.save(
+            this,
+            ForwardingRule(
+                id = "legacy-single-rule",
+                source = source,
+                channels = setOf(ForwardingRuleStore.SMS),
+                destinations = mapOf(ForwardingRuleStore.SMS to target),
+                enabled = draftEnabled
+            )
+        )
     }
 
     private fun requestRequiredPermissions() {
@@ -563,7 +861,9 @@ class MainActivity : Activity() {
             Manifest.permission.READ_SMS,
             Manifest.permission.SEND_SMS,
             Manifest.permission.READ_CONTACTS
-        ).filterNot { hasPermission(it) }
+        ).toMutableList().apply {
+            if (android.os.Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
+        }.filterNot { hasPermission(it) }
         if (missing.isEmpty()) {
             toast(t("SMS and Contacts permissions are granted.", "مجوزهای پیامک و مخاطبین فعال‌اند."))
             render()
@@ -789,6 +1089,63 @@ class MainActivity : Activity() {
             .show()
     }
 
+
+    private fun handleDeliveryIntent(deliveryIntent: Intent) {
+        if (deliveryIntent.action != ACTION_OPEN_CHANNEL) return
+        val channel = deliveryIntent.getStringExtra(EXTRA_DELIVERY_CHANNEL).orEmpty()
+        val source = deliveryIntent.getStringExtra(EXTRA_DELIVERY_SOURCE).orEmpty()
+        val target = deliveryIntent.getStringExtra(EXTRA_DELIVERY_TARGET).orEmpty()
+        val body = deliveryIntent.getStringExtra(EXTRA_DELIVERY_BODY).orEmpty()
+        if (body.isBlank()) return
+        deliveryIntent.action = null
+
+        if (channel == ForwardingRuleStore.EMAIL) {
+            try {
+                val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", target, null)).apply {
+                    putExtra(Intent.EXTRA_SUBJECT, "Forwarded SMS from $source")
+                    putExtra(Intent.EXTRA_TEXT, body)
+                }
+                startActivity(emailIntent)
+            } catch (_: Exception) {
+                toast(t("No email app is available. Copy the message from History.", "برنامه‌ای برای ایمیل پیدا نشد؛ متن را از سوابق بردار."))
+            }
+            return
+        }
+
+        val appPackage = when (channel) {
+            ForwardingRuleStore.TELEGRAM -> "org.telegram.messenger"
+            ForwardingRuleStore.WHATSAPP -> "com.whatsapp"
+            ForwardingRuleStore.BALE -> "ir.nasim"
+            ForwardingRuleStore.EITAA -> "ir.eitaa.messenger"
+            else -> null
+        }
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, body)
+        }
+        val appIntent = Intent(shareIntent)
+        if (!appPackage.isNullOrBlank()) appIntent.setPackage(appPackage)
+        AlertDialog.Builder(this)
+            .setTitle(t("Review and send message", "بررسی و ارسال پیام"))
+            .setMessage(t(
+                "The selected app will open with the message text. Check the recipient ($target) in that app, then press Send. SMS Forwarder cannot silently send on your behalf through third-party messenger apps.",
+                "برنامه‌ی انتخاب‌شده با متن پیام باز می‌شود. گیرنده ($target) را داخل آن بررسی کن و سپس ارسال را بزن. SMS Forwarder نمی‌تواند از طرف تو و بدون تأیید، در پیام‌رسان‌های دیگر پیام بفرستد."
+            ))
+            .setPositiveButton(t("Continue", "ادامه")) { _, _ ->
+                try {
+                    startActivity(appIntent)
+                } catch (_: Exception) {
+                    try {
+                        startActivity(Intent.createChooser(shareIntent, t("Choose an app", "انتخاب برنامه")))
+                    } catch (_: Exception) {
+                        toast(t("No compatible app was found.", "برنامه‌ی سازگار پیدا نشد."))
+                    }
+                }
+            }
+            .setNegativeButton(t("Cancel", "انصراف"), null)
+            .show()
+    }
+
     private fun requestIgnoreBattery() {
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
         if (pm.isIgnoringBatteryOptimizations(packageName)) {
@@ -810,9 +1167,12 @@ class MainActivity : Activity() {
         else -> t("Queued", "در صف")
     }
 
-    private fun modeLabel(mode: String): String =
-        if (mode == "automatic") t("Automatic forwarding", "فوروارد خودکار")
-        else t("Manual one-time send", "ارسال دستی یک‌باره")
+    private fun modeLabel(mode: String): String = when {
+        mode == "automatic" -> t("Automatic SMS forwarding", "فوروارد خودکار پیامک")
+        mode.startsWith("handoff_") -> t("User-confirmed handoff: ", "واگذاری برای تأیید کاربر: ") +
+            channelLabel(mode.removePrefix("handoff_"))
+        else -> t("Manual one-time send", "ارسال دستی یک‌باره")
+    }
 
     private fun formatTimestamp(timestamp: Long): String =
         if (timestamp <= 0) "—" else DateFormat.getDateTimeInstance(
@@ -840,9 +1200,15 @@ class MainActivity : Activity() {
         private const val REQUEST_CONTACTS = 101
         private const val REQUEST_SMS_PICKER = 102
         private const val REQUEST_SEND_SMS = 103
-        private const val TAB_FORWARD = 0
-        private const val TAB_HISTORY = 1
-        private const val TAB_ABOUT = 2
+        const val TAB_FORWARD = 0
+        const val TAB_RULES = 1
+        const val TAB_HISTORY = 2
+        const val TAB_ABOUT = 3
+        const val ACTION_OPEN_CHANNEL = "com.example.smsforwarder.OPEN_CHANNEL"
+        const val EXTRA_DELIVERY_CHANNEL = "delivery_channel"
+        const val EXTRA_DELIVERY_SOURCE = "delivery_source"
+        const val EXTRA_DELIVERY_TARGET = "delivery_target"
+        const val EXTRA_DELIVERY_BODY = "delivery_body"
         private const val MAX_SMS_ITEMS = 100
         private const val MAX_CONTACT_ITEMS = 300
         private const val REPOSITORY_URL = "https://github.com/sdwqe34/SMS_Forwarder"
